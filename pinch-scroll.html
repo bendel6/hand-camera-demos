@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PINCH//SCROLL — Hand Telemetry Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#050706;
+    --bg-2:#0a0d0b;
+    --fg:#d6e7df;
+    --muted:#5a766b;
+    --accent:#00ff9c;
+    --warn:#ff3b6b;
+    --grid:rgba(0,255,156,.045);
+    --line:rgba(0,255,156,.18);
+    --font-display:"Major Mono Display", monospace;
+    --font-mono:"JetBrains Mono", ui-monospace, monospace;
+  }
+  *{ box-sizing:border-box }
+  html{ scroll-behavior:auto; background:var(--bg) }
+  body{
+    margin:0; min-height:100%;
+    color:var(--fg);
+    font-family:var(--font-mono);
+    font-weight:300;
+    line-height:1.65;
+    background:var(--bg);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* Fixed grid backdrop */
+  body::before{
+    content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 48px 48px, 48px 48px;
+    mask-image: radial-gradient(ellipse at 50% 30%, #000 30%, transparent 90%);
+    -webkit-mask-image: radial-gradient(ellipse at 50% 30%, #000 30%, transparent 90%);
+  }
+  body::after{
+    content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(900px 500px at 80% 10%, rgba(0,255,156,.06), transparent 60%),
+      radial-gradient(900px 500px at 10% 90%, rgba(255,59,107,.05), transparent 60%);
+  }
+
+  /* ---------- HUD ---------- */
+  .hud{
+    position:fixed; top:14px; left:14px; right:14px; z-index:30;
+    display:flex; gap:12px;
+    color:var(--accent);
+    font-size:12px;
+    pointer-events:none;
+  }
+  .hud > *{ pointer-events:auto }
+  .hud .panel{
+    background:rgba(5,7,6,.78);
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:8px 12px;
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    box-shadow:0 0 0 1px rgba(0,255,156,.05) inset, 0 6px 30px rgba(0,0,0,.4);
+  }
+  .hud-title{
+    display:flex; align-items:center; gap:10px;
+    font-family:var(--font-display);
+    letter-spacing:.04em; font-size:13px;
+    color:var(--accent);
+  }
+  .hud-title .rec{
+    width:8px; height:8px; border-radius:50%;
+    background:var(--warn); box-shadow:0 0 10px var(--warn);
+    animation:rec 1.4s ease-in-out infinite;
+  }
+  @keyframes rec{ 50%{ opacity:.3 } }
+  .hud-title button{
+    margin-left:auto; cursor:pointer;
+    background:transparent; border:1px solid var(--line);
+    color:var(--accent); font-family:var(--font-mono); font-size:11px;
+    padding:3px 8px; border-radius:2px;
+  }
+  .hud-title button:hover{ background:rgba(0,255,156,.08) }
+
+  .hud-stats{
+    display:grid; grid-template-columns:repeat(4, minmax(0, 1fr));
+    gap:1px; background:var(--line); border:1px solid var(--line);
+    border-radius:2px; overflow:hidden;
+    font-size:11px; letter-spacing:.02em;
+    flex:1; max-width:780px;
+  }
+  .hud-stats .cell{ background:rgba(5,7,6,.85); padding:8px 12px; display:flex; flex-direction:column; gap:2px }
+  .hud-stats .label{ color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:.18em }
+  .hud-stats .value{ color:var(--accent); font-weight:500; font-variant-numeric:tabular-nums }
+  .hud-stats .value.warn{ color:var(--warn) }
+  .hud-stats .value.muted{ color:var(--muted) }
+
+  .hud.collapsed .hud-stats{ display:none }
+
+  /* Left scroll rail */
+  .rail{
+    position:fixed; left:0; top:0; bottom:0; width:3px; z-index:25;
+    background:linear-gradient(180deg, rgba(0,255,156,.04), rgba(0,255,156,.02));
+    pointer-events:none;
+  }
+  .rail > i{
+    display:block; position:absolute; left:0; top:0; width:100%;
+    background:var(--accent); box-shadow:0 0 12px var(--accent);
+    height:8%;
+    transition:height .15s linear;
+  }
+  .rail.pulse > i{ animation:railPulse .8s ease-in-out infinite }
+  @keyframes railPulse{
+    0%,100%{ box-shadow:0 0 8px var(--accent) }
+    50%{ box-shadow:0 0 22px var(--accent), 0 0 40px rgba(0,255,156,.5) }
+  }
+
+  /* ---------- Content ---------- */
+  main{ position:relative; z-index:5; max-width:720px; margin:0 auto; padding:160px 24px 240px }
+  section{ margin:0 0 160px }
+  section .meta{
+    font-family:var(--font-mono); color:var(--accent); letter-spacing:.3em;
+    font-size:11px; text-transform:uppercase; margin-bottom:14px;
+    display:flex; align-items:center; gap:10px;
+  }
+  section .meta::before{
+    content:""; width:18px; height:1px; background:var(--accent);
+    box-shadow:0 0 8px var(--accent);
+  }
+  section h2{
+    font-family:var(--font-display);
+    font-weight:400;
+    font-size:clamp(34px, 5.4vw, 60px);
+    margin:0 0 24px;
+    color:var(--fg);
+    letter-spacing:-.01em;
+    line-height:1.05;
+    text-shadow:0 0 30px rgba(0,255,156,.08);
+  }
+  section h2 em{ font-style:normal; color:var(--accent); text-shadow:0 0 18px rgba(0,255,156,.5) }
+  section p{ margin:0 0 18px; color:#bcd2c7; font-weight:300 }
+  section p code{
+    background:rgba(0,255,156,.08); border:1px solid var(--line);
+    padding:1px 6px; border-radius:2px; color:var(--accent);
+    font-size:.9em;
+  }
+  hr.div{
+    border:0; height:1px;
+    background:linear-gradient(90deg, transparent, var(--line), transparent);
+    margin:0 0 160px;
+  }
+
+  /* ---------- Camera preview ---------- */
+  .preview{
+    position:fixed; right:16px; bottom:16px; z-index:35;
+    width:240px; aspect-ratio: 4/3;
+    border:1px solid var(--line);
+    border-radius:2px;
+    overflow:hidden;
+    background:#000;
+    box-shadow:0 0 0 1px rgba(0,255,156,.06) inset, 0 12px 40px rgba(0,0,0,.5), 0 0 24px rgba(0,255,156,.1);
+  }
+  .preview video, .preview canvas{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    transform: scaleX(-1);
+    transform-origin:center;
+  }
+  .preview video{ object-fit:cover; opacity:.55; filter:contrast(.9) saturate(.7) brightness(.85) }
+  .preview canvas{ background:transparent }
+  .preview .corner{
+    position:absolute; width:14px; height:14px; border:1px solid var(--accent);
+    pointer-events:none; opacity:.85;
+  }
+  .preview .corner.tl{ top:6px; left:6px; border-right:0; border-bottom:0 }
+  .preview .corner.tr{ top:6px; right:6px; border-left:0; border-bottom:0 }
+  .preview .corner.bl{ bottom:6px; left:6px; border-right:0; border-top:0 }
+  .preview .corner.br{ bottom:6px; right:6px; border-left:0; border-top:0 }
+  .preview .tag{
+    position:absolute; left:8px; bottom:8px; z-index:2;
+    font-family:var(--font-mono); font-size:10px; letter-spacing:.2em;
+    color:var(--accent); text-shadow:0 0 6px rgba(0,255,156,.5);
+    background:rgba(0,0,0,.4); padding:2px 6px; border:1px solid var(--line);
+  }
+
+  @media (max-width:640px){
+    .preview{ width:160px; right:10px; bottom:10px }
+    .hud{ top:8px; left:8px; right:8px }
+    .hud-stats{ grid-template-columns:repeat(2, 1fr) }
+    main{ padding:140px 18px 200px }
+  }
+
+  /* ---------- Hand cursor ---------- */
+  .cursor{
+    position:fixed; top:0; left:0; z-index:90;
+    --x:0px; --y:0px; --s:1;
+    width:48px; height:48px;
+    transform: translate(calc(var(--x) - 24px), calc(var(--y) - 24px)) scale(var(--s));
+    border:2px solid var(--accent);
+    border-radius:50%;
+    background:rgba(0,255,156,.08);
+    box-shadow:0 0 16px rgba(0,255,156,.4), inset 0 0 12px rgba(0,255,156,.18);
+    pointer-events:none;
+    opacity:0;
+    transition:opacity .15s ease, background .12s ease, border-color .12s ease, box-shadow .12s ease;
+    will-change: transform;
+  }
+  .cursor.visible{ opacity:1 }
+  .cursor::before{
+    content:""; position:absolute; inset:0; margin:auto;
+    width:6px; height:6px; border-radius:50%;
+    background:var(--accent); box-shadow:0 0 8px var(--accent);
+  }
+  .cursor::after{
+    content:""; position:absolute; inset:-8px;
+    border:1px solid rgba(0,255,156,.18); border-radius:50%;
+    transition:transform .2s ease, opacity .2s ease;
+  }
+  .cursor.click{
+    background:rgba(0,255,156,.35);
+    border-color:#fff;
+    box-shadow:0 0 32px rgba(0,255,156,.9), inset 0 0 20px rgba(0,255,156,.55);
+  }
+  .cursor.click::after{
+    transform:scale(1.8); opacity:0;
+  }
+  .cursor.ripple::after{
+    animation: rip .45s ease-out forwards;
+  }
+  @keyframes rip{
+    0%{ transform:scale(.4); opacity:.9; border-color:#fff }
+    100%{ transform:scale(2.4); opacity:0; border-color:var(--accent) }
+  }
+
+  /* ---------- Tap demo panel ---------- */
+  .tapdemo{
+    position:fixed; left:16px; bottom:16px; z-index:35;
+    background:rgba(5,7,6,.85);
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:12px 14px;
+    font-family:var(--font-mono);
+    color:var(--accent);
+    font-size:11px; letter-spacing:.12em;
+    backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+    box-shadow:0 0 0 1px rgba(0,255,156,.05) inset, 0 10px 40px rgba(0,0,0,.45);
+    display:flex; flex-direction:column; gap:8px;
+    min-width:200px;
+  }
+  .tapdemo .row{ display:flex; gap:8px; align-items:center }
+  .tapdemo .count{
+    flex:1; font-family:var(--font-display); font-size:22px;
+    color:var(--fg); letter-spacing:.05em;
+  }
+  .tapdemo .count em{ color:var(--accent); font-style:normal; text-shadow:0 0 12px rgba(0,255,156,.5) }
+  .tapdemo button{
+    cursor:pointer;
+    font:500 11px/1 var(--font-mono); letter-spacing:.14em;
+    color:var(--accent); background:transparent;
+    border:1px solid var(--line); padding:8px 12px; border-radius:2px;
+    transition:background .15s ease, color .15s ease, box-shadow .15s ease;
+  }
+  .tapdemo button:hover{ background:rgba(0,255,156,.08); box-shadow:0 0 12px rgba(0,255,156,.2) }
+  .tapdemo button.warn{ color:var(--warn); border-color:rgba(255,59,107,.4) }
+  .tapdemo button.warn:hover{ background:rgba(255,59,107,.08); box-shadow:0 0 12px rgba(255,59,107,.2) }
+  .tapdemo .toggles{ display:flex; gap:6px; flex-wrap:wrap }
+  .tapdemo .tog{
+    cursor:pointer; padding:6px 10px;
+    border:1px solid var(--line); color:var(--accent);
+    font:500 10px/1 var(--font-mono); letter-spacing:.15em;
+    background:transparent; border-radius:2px;
+  }
+  .tapdemo .tog.on{ background:var(--accent); color:#04120c; box-shadow:0 0 12px rgba(0,255,156,.4) }
+  @media (max-width:640px){
+    .tapdemo{ left:10px; bottom:184px; min-width:170px }
+  }
+
+  /* ---------- Gate ---------- */
+  .gate{
+    position:fixed; inset:0; z-index:100;
+    background:radial-gradient(900px 600px at 50% 30%, rgba(0,255,156,.06), transparent 70%), #050706;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--fg);
+  }
+  .gate.hidden{ display:none }
+  .gate .card{
+    width:min(480px, 92vw);
+    padding:28px 28px 24px;
+    border:1px solid var(--line);
+    background:rgba(5,7,6,.85);
+    border-radius:2px;
+    box-shadow:0 0 0 1px rgba(0,255,156,.05) inset, 0 20px 80px rgba(0,0,0,.6);
+  }
+  .gate .tag{
+    color:var(--accent); font-size:11px; letter-spacing:.3em; text-transform:uppercase;
+    display:flex; align-items:center; gap:8px; margin-bottom:14px;
+  }
+  .gate .tag::before{ content:""; width:14px; height:1px; background:var(--accent); box-shadow:0 0 6px var(--accent) }
+  .gate h1{
+    font-family:var(--font-display); font-weight:400;
+    font-size:30px; margin:0 0 12px; color:var(--fg); letter-spacing:.02em;
+  }
+  .gate h1 em{ font-style:normal; color:var(--accent); text-shadow:0 0 18px rgba(0,255,156,.4) }
+  .gate p{ margin:0 0 20px; color:#9fb6aa; font-size:13px; line-height:1.6 }
+  .gate button{
+    cursor:pointer; font:500 13px/1 var(--font-mono);
+    color:#04120c; background:var(--accent); border:0;
+    padding:12px 18px; border-radius:2px; letter-spacing:.06em;
+    box-shadow:0 0 24px rgba(0,255,156,.25);
+    transition:transform .15s ease, box-shadow .2s ease;
+  }
+  .gate button:hover{ transform:translateY(-1px); box-shadow:0 0 30px rgba(0,255,156,.45) }
+  .gate .err{
+    margin-top:14px; padding:10px 12px;
+    border:1px solid rgba(255,59,107,.4); color:var(--warn);
+    font-size:12px; font-family:var(--font-mono);
+    display:none; white-space:pre-wrap;
+  }
+  .gate .err.show{ display:block }
+  .gate .hint{ margin-top:14px; color:var(--muted); font-size:11px; letter-spacing:.06em }
+</style>
+</head>
+<body>
+
+  <!-- Permission gate -->
+  <div class="gate" id="gate">
+    <div class="card">
+      <div class="tag">SYS//AUTH</div>
+      <h1>PINCH<em>//</em>SCROLL</h1>
+      <p>Grant camera access. Pinch your thumb and index finger together, then move your hand up or down to scroll the page. Everything runs locally in your browser — no frames are sent anywhere.</p>
+      <button id="startBtn">ENABLE CAMERA →</button>
+      <div class="err" id="gateError"></div>
+      <div class="hint">localhost is a secure context — http works.</div>
+    </div>
+  </div>
+
+  <!-- Scroll rail -->
+  <div class="rail" id="rail"><i></i></div>
+
+  <!-- HUD -->
+  <div class="hud" id="hud">
+    <div class="panel hud-title">
+      <span class="rec"></span>
+      <span>HAND::TELEMETRY</span>
+      <button id="hudToggle" title="Collapse / expand">— HIDE</button>
+    </div>
+    <div class="panel hud-stats">
+      <div class="cell"><span class="label">Mode</span><span class="value" id="sMode">idle</span></div>
+      <div class="cell"><span class="label">Pinch (T+I)</span><span class="value" id="sDist">—</span></div>
+      <div class="cell"><span class="label">Click (T+M)</span><span class="value" id="sClick">—</span></div>
+      <div class="cell"><span class="label">Scroll</span><span class="value" id="sScroll">0</span></div>
+    </div>
+  </div>
+
+  <!-- Hand cursor -->
+  <div class="cursor" id="cursor" aria-hidden="true"></div>
+
+  <!-- Tap demo panel -->
+  <div class="tapdemo" id="tapdemo">
+    <div class="row">
+      <div class="count">TAPS <em id="tapCount">0</em></div>
+    </div>
+    <div class="row">
+      <button id="tapBtn">+ TAP</button>
+      <button id="tapReset" class="warn">RESET</button>
+    </div>
+    <div class="toggles" id="togRow">
+      <button class="tog" data-i="0">A</button>
+      <button class="tog" data-i="1">B</button>
+      <button class="tog" data-i="2">C</button>
+      <button class="tog" data-i="3">D</button>
+    </div>
+  </div>
+
+  <!-- Camera preview -->
+  <div class="preview" id="preview">
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="overlay"></canvas>
+    <span class="corner tl"></span><span class="corner tr"></span>
+    <span class="corner bl"></span><span class="corner br"></span>
+    <span class="tag">CAM//00</span>
+  </div>
+
+  <!-- Page content -->
+  <main>
+    <section>
+      <div class="meta">SEC 01 — INTRO</div>
+      <h2>Your hand is the <em>scroll wheel</em>.</h2>
+      <p>This page is driven by a single gesture: bring your thumb and index finger together to engage, then drift your hand up or down. The camera-derived skeleton runs through MediaPipe Hands in your browser; no frames leave the device.</p>
+      <p>The preview in the bottom right shows what the model sees. Joints are tracked in 21 landmarks per hand; we only care about two of them — landmark <code>4</code> (thumb tip) and landmark <code>8</code> (index tip).</p>
+    </section>
+    <hr class="div" />
+
+    <section>
+      <div class="meta">SEC 02 — PINCH</div>
+      <h2>Hysteresis avoids <em>flicker</em>.</h2>
+      <p>Engagement and release use different thresholds. You enter pinch mode when the normalized thumb–index distance drops below <code>PINCH_THRESHOLD</code>, and you stay pinched until it rises above the larger <code>RELEASE_THRESHOLD</code>.</p>
+      <p>This is the same trick a Schmitt trigger uses to ignore noise around an edge. Without it, a half-pinched hand at the boundary toggles dozens of times per second and the page jitters.</p>
+    </section>
+    <hr class="div" />
+
+    <section>
+      <div class="meta">SEC 03 — MOTION</div>
+      <h2>Anchor, then <em>track delta</em>.</h2>
+      <p>On pinch start we capture the current midpoint Y of the two fingertips and the current <code>window.scrollY</code>. From that frame on, the scroll position is set to <code>anchorScroll - (currentY - anchorY) * GAIN</code>.</p>
+      <p>Moving your hand up makes the page scroll down — the same direction your finger pushes content on a touchscreen. Release the pinch to drop the anchor; the next pinch starts a fresh interaction.</p>
+    </section>
+    <hr class="div" />
+
+    <section>
+      <div class="meta">SEC 04 — SMOOTHING</div>
+      <h2>Raw landmarks <em>shimmer</em>.</h2>
+      <p>Per-frame model output is noisy at the millimeter scale. An exponential moving average on the midpoint with factor <code>SMOOTHING ≈ 0.55</code> trades a few frames of latency for a much calmer cursor.</p>
+      <p>A small <code>DEAD_ZONE</code> on the delta keeps tiny hand tremors from creeping the page when you mean to hold still.</p>
+    </section>
+    <hr class="div" />
+
+    <section>
+      <div class="meta">SEC 05 — LOSS</div>
+      <h2>If the hand <em>vanishes</em>.</h2>
+      <p>Walking out of frame mid-pinch shouldn't strand you in a phantom drag. After three consecutive frames with no detected hand, the pinch is cancelled. Bringing your hand back in starts a new interaction with a fresh anchor.</p>
+    </section>
+    <hr class="div" />
+
+    <section>
+      <div class="meta">SEC 06 — TWEAK</div>
+      <h2>All knobs are <em>at the top</em>.</h2>
+      <p>Open <code>pinch-scroll.html</code> and find the consts: <code>PINCH_THRESHOLD</code>, <code>RELEASE_THRESHOLD</code>, <code>GAIN</code>, <code>DEAD_ZONE</code>, <code>SMOOTHING</code>. Refresh — no build step.</p>
+      <p>End of feed.</p>
+    </section>
+  </main>
+
+  <!-- MediaPipe Hands from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/hands.js" crossorigin="anonymous"></script>
+
+<script>
+(() => {
+  // ============ TUNING KNOBS ============
+  const PINCH_THRESHOLD   = 0.095;   // thumb+index — engage scroll
+  const RELEASE_THRESHOLD = 0.135;   // thumb+index — release scroll
+  const CLICK_THRESHOLD   = 0.075;   // thumb+middle — engage click
+  const CLICK_RELEASE     = 0.115;   // thumb+middle — release click
+  const GAIN              = 4500;    // pixels per unit of normalized Y (scroll)
+  const DEAD_ZONE         = 0.006;   // ignore tiny midpoint shifts
+  const SMOOTHING         = 0.30;    // EMA on fingertip midpoint (lower = snappier)
+  const SCROLL_SMOOTH     = 0.22;    // lerp factor toward target scroll each rAF frame
+  const CURSOR_SMOOTH     = 0.45;    // lerp factor for the hand cursor (higher = snappier)
+  // ======================================
+
+  const HAND_CONNECTIONS = [
+    [0,1],[1,2],[2,3],[3,4],
+    [0,5],[5,6],[6,7],[7,8],
+    [5,9],[9,10],[10,11],[11,12],
+    [9,13],[13,14],[14,15],[15,16],
+    [13,17],[17,18],[18,19],[19,20],
+    [0,17]
+  ];
+
+  const video   = document.getElementById('video');
+  const overlay = document.getElementById('overlay');
+  const octx    = overlay.getContext('2d');
+  const gate    = document.getElementById('gate');
+  const gateErr = document.getElementById('gateError');
+  const startBtn= document.getElementById('startBtn');
+  const hud     = document.getElementById('hud');
+  const hudToggle = document.getElementById('hudToggle');
+  const sMode   = document.getElementById('sMode');
+  const sDist   = document.getElementById('sDist');
+  const sClick  = document.getElementById('sClick');
+  const sScroll = document.getElementById('sScroll');
+  const rail    = document.getElementById('rail');
+  const railFill= rail.querySelector('i');
+  const cursor  = document.getElementById('cursor');
+
+  // Tap demo wiring
+  const tapCount = document.getElementById('tapCount');
+  let _taps = 0;
+  document.getElementById('tapBtn').addEventListener('click', () => {
+    _taps++; tapCount.textContent = _taps;
+  });
+  document.getElementById('tapReset').addEventListener('click', () => {
+    _taps = 0; tapCount.textContent = 0;
+  });
+  document.querySelectorAll('#togRow .tog').forEach(b => {
+    b.addEventListener('click', () => b.classList.toggle('on'));
+  });
+
+  // ---------- HUD collapse ----------
+  hudToggle.addEventListener('click', () => {
+    hud.classList.toggle('collapsed');
+    hudToggle.textContent = hud.classList.contains('collapsed') ? '+ SHOW' : '— HIDE';
+  });
+
+  // ---------- Camera ----------
+  async function startCamera(){
+    gateErr.classList.remove('show'); gateErr.textContent = '';
+    try{
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode:'user', width:{ ideal:640 }, height:{ ideal:480 } },
+        audio: false
+      });
+      video.srcObject = stream;
+      await video.play();
+      gate.classList.add('hidden');
+      initMediaPipe();
+    } catch(err){
+      let msg;
+      switch(err.name){
+        case 'NotAllowedError':
+          msg = 'Permission denied.\nAllow camera in your browser, then click ENABLE CAMERA again.'; break;
+        case 'NotFoundError':
+          msg = 'No camera found.\nPlug one in or enable an internal camera, then retry.'; break;
+        case 'NotReadableError':
+          msg = 'Camera is busy.\nClose other apps using it (Zoom, Meet, OBS) and retry.'; break;
+        default:
+          msg = (err.name || 'Error') + ': ' + (err.message || String(err));
+      }
+      gateErr.textContent = msg; gateErr.classList.add('show');
+    }
+  }
+  startBtn.addEventListener('click', startCamera);
+
+  // ---------- MediaPipe init ----------
+  let hands = null;
+  function initMediaPipe(){
+    /* global Hands */
+    hands = new Hands({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/${file}`
+    });
+    hands.setOptions({
+      maxNumHands: 1,
+      modelComplexity: 1,
+      minDetectionConfidence: 0.6,
+      minTrackingConfidence: 0.5
+    });
+    hands.onResults(onResults);
+    pump();
+  }
+
+  let busy = false;
+  async function pump(){
+    if(!busy && video.readyState >= 2 && video.videoWidth > 0){
+      busy = true;
+      try { await hands.send({ image: video }); }
+      catch(e){ /* swallow */ }
+      busy = false;
+    }
+    requestAnimationFrame(pump);
+  }
+
+  // ---------- State ----------
+  let pinched = false;
+  let anchorY = null;
+  let anchorScroll = 0;
+  let smoothMidY = null;
+  let lostFrames = 0;
+  let lastDist = null;
+  let scrollPulseTimeout = null;
+
+  // Smooth-scroll loop: MediaPipe fires ~30fps; we lerp toward the target every rAF.
+  let targetScrollY = window.scrollY;
+  let currentScrollY = window.scrollY;
+  let pinchScrolling = false;
+
+  // Hand cursor state
+  let cursorX = window.innerWidth / 2, cursorY = window.innerHeight / 2;
+  let targetCursorX = cursorX, targetCursorY = cursorY;
+  let cursorVisible = false;
+  let clickEngaged = false;
+
+  function frameLoop(){
+    // scroll lerp
+    if(pinchScrolling){
+      const diff = targetScrollY - currentScrollY;
+      if(Math.abs(diff) > 0.3){
+        currentScrollY += diff * SCROLL_SMOOTH;
+      } else {
+        currentScrollY = targetScrollY;
+      }
+      window.scrollTo(0, currentScrollY);
+    }
+
+    // cursor lerp
+    cursorX += (targetCursorX - cursorX) * CURSOR_SMOOTH;
+    cursorY += (targetCursorY - cursorY) * CURSOR_SMOOTH;
+    cursor.style.setProperty('--x', cursorX.toFixed(1) + 'px');
+    cursor.style.setProperty('--y', cursorY.toFixed(1) + 'px');
+
+    requestAnimationFrame(frameLoop);
+  }
+  requestAnimationFrame(frameLoop);
+
+  function dispatchClickAt(x, y){
+    const el = document.elementFromPoint(x, y);
+    if(!el) return;
+    const opts = { bubbles:true, cancelable:true, clientX:x, clientY:y, button:0, view:window };
+    el.dispatchEvent(new MouseEvent('mousedown', opts));
+    el.dispatchEvent(new MouseEvent('mouseup',   opts));
+    el.dispatchEvent(new MouseEvent('click',     opts));
+    // visual ripple
+    cursor.classList.remove('ripple');
+    void cursor.offsetWidth; // restart animation
+    cursor.classList.add('ripple');
+  }
+
+  function setMode(m){
+    sMode.textContent = m;
+    sMode.classList.remove('warn','muted');
+    if(m === 'scroll' || m === 'click') sMode.style.color = 'var(--accent)';
+    else if(m === 'lost'){ sMode.classList.add('warn'); sMode.style.color = ''; }
+    else { sMode.classList.add('muted'); sMode.style.color = ''; }
+  }
+  setMode('idle');
+
+  function pulseRail(){
+    rail.classList.add('pulse');
+    clearTimeout(scrollPulseTimeout);
+    scrollPulseTimeout = setTimeout(() => rail.classList.remove('pulse'), 320);
+  }
+
+  function updateRail(){
+    const doc = document.documentElement;
+    const max = Math.max(1, doc.scrollHeight - window.innerHeight);
+    const pct = Math.max(0, Math.min(1, window.scrollY / max));
+    // bar height is window/scrollHeight ratio
+    const ratio = window.innerHeight / Math.max(window.innerHeight, doc.scrollHeight);
+    const barH = Math.max(6, ratio * 100);
+    railFill.style.height = barH + '%';
+    railFill.style.top = (pct * (100 - barH)) + '%';
+    sScroll.textContent = Math.round(window.scrollY) + ' px';
+  }
+  window.addEventListener('scroll', () => { pulseRail(); updateRail(); }, { passive:true });
+  window.addEventListener('resize', updateRail);
+  updateRail();
+
+  // ---------- Drawing ----------
+  function fitOverlay(){
+    const r = overlay.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    overlay.width  = Math.max(1, Math.round(r.width  * dpr));
+    overlay.height = Math.max(1, Math.round(r.height * dpr));
+  }
+  new ResizeObserver(fitOverlay).observe(overlay);
+  fitOverlay();
+
+  function drawSkeleton(landmarks, isPinched){
+    const W = overlay.width, H = overlay.height;
+    octx.clearRect(0,0,W,H);
+    if(!landmarks) return;
+
+    // connections
+    octx.lineWidth = Math.max(1.5, W * 0.005);
+    octx.strokeStyle = 'rgba(0,255,156,.55)';
+    octx.beginPath();
+    for(const [a,b] of HAND_CONNECTIONS){
+      const pa = landmarks[a], pb = landmarks[b];
+      octx.moveTo(pa.x * W, pa.y * H);
+      octx.lineTo(pb.x * W, pb.y * H);
+    }
+    octx.stroke();
+
+    // joints
+    octx.fillStyle = 'rgba(0,255,156,.85)';
+    const jr = Math.max(2, W * 0.008);
+    for(let i=0;i<landmarks.length;i++){
+      if(i === 4 || i === 8) continue;
+      const p = landmarks[i];
+      octx.beginPath();
+      octx.arc(p.x * W, p.y * H, jr, 0, Math.PI*2);
+      octx.fill();
+    }
+
+    // thumb + index tips (larger, colored)
+    const thumb = landmarks[4], index = landmarks[8];
+    const tipColor = isPinched ? '#00ff9c' : '#ff3b6b';
+
+    // line between them
+    octx.lineWidth = Math.max(2, W * 0.008);
+    octx.strokeStyle = tipColor;
+    if(isPinched){
+      octx.setLineDash([]);
+    } else {
+      octx.setLineDash([Math.max(4, W * 0.014), Math.max(4, W * 0.014)]);
+    }
+    octx.beginPath();
+    octx.moveTo(thumb.x * W, thumb.y * H);
+    octx.lineTo(index.x * W, index.y * H);
+    octx.stroke();
+    octx.setLineDash([]);
+
+    const tipR = Math.max(4, W * 0.018);
+    octx.fillStyle = tipColor;
+    octx.shadowColor = tipColor;
+    octx.shadowBlur  = isPinched ? 18 : 8;
+    octx.beginPath(); octx.arc(thumb.x * W, thumb.y * H, tipR, 0, Math.PI*2); octx.fill();
+    octx.beginPath(); octx.arc(index.x * W, index.y * H, tipR, 0, Math.PI*2); octx.fill();
+    octx.shadowBlur = 0;
+  }
+
+  // ---------- Hands results ----------
+  function onResults(results){
+    const landmarks = (results.multiHandLandmarks && results.multiHandLandmarks[0]) || null;
+
+    if(!landmarks){
+      drawSkeleton(null, pinched);
+      if(pinched){
+        lostFrames++;
+        if(lostFrames >= 3){
+          pinched = false;
+          anchorY = null;
+          smoothMidY = null;
+          pinchScrolling = false;
+          setMode('lost');
+        }
+      } else {
+        setMode('idle');
+      }
+      // hide cursor + drop any click engagement
+      if(cursorVisible){
+        cursorVisible = false;
+        cursor.classList.remove('visible','click');
+      }
+      clickEngaged = false;
+      sDist.textContent  = '—';
+      sClick.textContent = '—';
+      return;
+    }
+    lostFrames = 0;
+
+    const thumb = landmarks[4];
+    const index = landmarks[8];
+    const dx = thumb.x - index.x;
+    const dy = thumb.y - index.y;
+    const dz = (thumb.z || 0) - (index.z || 0);
+    const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+    lastDist = dist;
+
+    const midY = (thumb.y + index.y) / 2;
+    smoothMidY = (smoothMidY == null) ? midY : (SMOOTHING * smoothMidY + (1 - SMOOTHING) * midY);
+
+    // ---- cursor follows index fingertip (mirror x to match the user's view) ----
+    targetCursorX = (1 - index.x) * window.innerWidth;
+    targetCursorY = index.y * window.innerHeight;
+    if(!cursorVisible){
+      // snap on first appearance so it doesn't slide across the screen
+      cursorX = targetCursorX; cursorY = targetCursorY;
+      cursorVisible = true;
+      cursor.classList.add('visible');
+    }
+
+    // ---- thumb + middle distance → click ----
+    const middle = landmarks[12];
+    const mdx = thumb.x - middle.x;
+    const mdy = thumb.y - middle.y;
+    const mdz = (thumb.z || 0) - (middle.z || 0);
+    const clickDist = Math.sqrt(mdx*mdx + mdy*mdy + mdz*mdz);
+
+    // ---- pinch (scroll) hysteresis ----
+    if(!pinched && dist < PINCH_THRESHOLD){
+      pinched = true;
+      anchorY = smoothMidY;
+      anchorScroll = window.scrollY;
+      currentScrollY = window.scrollY;
+      targetScrollY  = window.scrollY;
+      pinchScrolling = true;
+      // suppress click while scrolling; require explicit release before next click
+      clickEngaged = true;
+      cursor.classList.remove('click');
+      setMode('scroll');
+    } else if(pinched && dist > RELEASE_THRESHOLD){
+      pinched = false;
+      anchorY = null;
+      pinchScrolling = false;
+      setMode('idle');
+    } else if(pinched){
+      setMode('scroll');
+    } else {
+      setMode(clickEngaged ? 'click' : 'idle');
+    }
+
+    // ---- click (thumb + middle) hysteresis, disabled while scrolling ----
+    if(!pinched){
+      if(!clickEngaged && clickDist < CLICK_THRESHOLD){
+        clickEngaged = true;
+        cursor.classList.add('click');
+        dispatchClickAt(cursorX, cursorY);
+        setMode('click');
+      } else if(clickEngaged && clickDist > CLICK_RELEASE){
+        clickEngaged = false;
+        cursor.classList.remove('click');
+      }
+    }
+
+    // ---- update scroll target (rAF loop does the smooth lerp) ----
+    if(pinched && anchorY != null){
+      let rawDelta = smoothMidY - anchorY;
+      const delta = Math.abs(rawDelta) < DEAD_ZONE ? 0 : rawDelta;
+      // hand UP (y decreases) → page DOWN (scrollY increases)
+      const doc = document.documentElement;
+      const maxScroll = Math.max(0, doc.scrollHeight - window.innerHeight);
+      targetScrollY = Math.max(0, Math.min(maxScroll, anchorScroll - delta * GAIN));
+    }
+
+    sClick.textContent = clickDist.toFixed(3) +
+      (clickDist < CLICK_THRESHOLD ? '  <eng' :
+       clickDist > CLICK_RELEASE   ? '  >rel' : '  ~hys');
+
+    sDist.textContent = dist.toFixed(3) +
+      (dist < PINCH_THRESHOLD ? '  <eng' :
+       dist > RELEASE_THRESHOLD ? '  >rel' : '  ~hys');
+
+    drawSkeleton(landmarks, pinched);
+  }
+})();
+</script>
+</body>
+</html>

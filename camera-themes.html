@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Mirror — Pixel Motion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&family=VT323&family=Major+Mono+Display&family=Press+Start+2P&family=Cormorant+Garamond:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0b0f;
+    --fg:#f5f5f7;
+    --muted:rgba(245,245,247,.65);
+    --panel-bg:rgba(20,20,24,.55);
+    --panel-border:rgba(255,255,255,.12);
+    --radius:14px;
+    --font-display:"Space Grotesk", system-ui, sans-serif;
+    --font-body:"Inter", system-ui, sans-serif;
+    --font-mono:"Space Mono", ui-monospace, monospace;
+
+    /* motion (set by JS) */
+    --motion:0;       /* 0..1 overall */
+    --motion-x:0;     /* -1..1, horizontal bias */
+    --motion-y:0;     /* -1..1, vertical bias */
+    --hue:0deg;
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;height:100%;overflow:hidden}
+  body{
+    font-family:var(--font-body);
+    color:var(--fg);
+    background:var(--bg);
+    -webkit-font-smoothing:antialiased;
+    transition:background .4s ease, color .4s ease;
+  }
+
+  /* hidden video source */
+  #cam{ position:fixed; width:1px; height:1px; opacity:0; pointer-events:none; left:-10px; top:-10px }
+
+  /* pixel background canvas */
+  #pixel{
+    position:fixed; inset:0;
+    width:100%; height:100%;
+    z-index:0;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    background:#000;
+    transition:filter .4s ease, opacity .4s ease;
+  }
+  #overlay{ position:fixed; inset:0; pointer-events:none; z-index:1; transition:opacity .4s ease }
+  #vignette{ position:fixed; inset:0; pointer-events:none; z-index:2;
+    box-shadow: inset 0 0 200px 40px rgba(0,0,0,.55); }
+
+  /* App chrome */
+  .app{
+    position:fixed; inset:0; z-index:5;
+    display:grid; grid-template-rows:auto 1fr auto;
+    padding:24px;
+    pointer-events:none;
+  }
+  .app > *{ pointer-events:auto }
+
+  .topbar{ display:flex; justify-content:space-between; align-items:center; gap:16px }
+
+  .brand{
+    display:flex; align-items:center; gap:10px;
+    font-family:var(--font-display); font-weight:700;
+    letter-spacing:.02em; font-size:18px;
+    padding:10px 14px;
+    background:var(--panel-bg);
+    border:1px solid var(--panel-border);
+    border-radius:var(--radius);
+    backdrop-filter:blur(14px) saturate(140%);
+    -webkit-backdrop-filter:blur(14px) saturate(140%);
+    transform: translateX(calc(var(--motion-x) * 6px));
+  }
+  .brand .dot{
+    width:10px; height:10px; border-radius:50%;
+    background:#ff4d6d;
+    box-shadow:0 0 calc(8px + var(--motion) * 40px) #ff4d6d;
+    transform: scale(calc(1 + var(--motion) * 0.6));
+    transition: transform .12s ease;
+  }
+
+  .meta{
+    display:flex; align-items:center; gap:8px;
+    font-family:var(--font-mono); font-size:12px;
+    color:var(--muted);
+    padding:10px 12px;
+    background:var(--panel-bg);
+    border:1px solid var(--panel-border);
+    border-radius:var(--radius);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    transform: translateX(calc(var(--motion-x) * -6px));
+  }
+
+  .stage{
+    display:flex; flex-direction:column; justify-content:center; align-items:center;
+    text-align:center; gap:14px;
+  }
+  .stage h1{
+    font-family:var(--font-display);
+    font-weight:700;
+    margin:0;
+    font-size:clamp(40px, 8vw, 96px);
+    line-height:.95;
+    letter-spacing:-.02em;
+    text-shadow:0 4px 30px rgba(0,0,0,.45);
+    pointer-events:none;
+    transform:
+      translate(calc(var(--motion-x) * 18px), calc(var(--motion-y) * 14px))
+      rotate(calc(var(--motion-x) * 1.5deg));
+    transition: transform .08s linear;
+  }
+  .stage p{ margin:0; font-size:14px; color:var(--muted); max-width:520px; pointer-events:none }
+
+  .switcher-wrap{ display:flex; justify-content:center }
+  .switcher{
+    display:flex; gap:8px; flex-wrap:wrap; justify-content:center;
+    padding:10px;
+    background:var(--panel-bg);
+    border:1px solid var(--panel-border);
+    border-radius:999px;
+    backdrop-filter:blur(18px) saturate(160%);
+    -webkit-backdrop-filter:blur(18px) saturate(160%);
+    box-shadow:0 10px 40px rgba(0,0,0,.35);
+    max-width:min(96vw, 900px);
+    transform: translateY(calc(var(--motion) * -6px));
+  }
+  .chip{
+    cursor:pointer;
+    font:500 13px/1 var(--font-body);
+    color:var(--fg);
+    padding:10px 16px;
+    border-radius:999px;
+    border:1px solid transparent;
+    background:transparent;
+    transition:background .2s ease, color .2s ease, border-color .2s ease;
+    white-space:nowrap;
+  }
+  .chip:hover{ background:rgba(255,255,255,.08) }
+  .chip.active{ background:var(--fg); color:#111; border-color:rgba(0,0,0,.15) }
+
+  /* motion meter (tiny visual feedback) */
+  .meter{
+    position:fixed; left:24px; bottom:90px; z-index:5;
+    width:140px; height:6px;
+    background:rgba(255,255,255,.1);
+    border-radius:999px;
+    overflow:hidden;
+    border:1px solid var(--panel-border);
+  }
+  .meter > i{
+    display:block; height:100%;
+    width:calc(var(--motion) * 100%);
+    background:linear-gradient(90deg, #38f, #f3f, #fc3);
+    transition:width .08s linear;
+  }
+
+  /* Permission gate */
+  .gate{
+    position:fixed; inset:0; z-index:50;
+    display:flex; align-items:center; justify-content:center;
+    background:radial-gradient(1200px 600px at 50% 30%, rgba(255,255,255,.05), transparent 60%), #07070a;
+    color:#fff;
+  }
+  .gate .card{
+    width:min(460px, 92vw);
+    padding:28px;
+    background:rgba(20,20,24,.7);
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:18px;
+    backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+    text-align:center;
+  }
+  .gate h2{ margin:0 0 8px; font-family:var(--font-display); font-size:22px }
+  .gate p{ margin:0 0 20px; color:rgba(255,255,255,.7); font-size:14px; line-height:1.55 }
+  .gate button{
+    cursor:pointer; font:600 14px/1 var(--font-body);
+    color:#0b0b0f; background:#fff; border:0;
+    padding:12px 20px; border-radius:12px;
+    transition:transform .15s ease, box-shadow .2s ease;
+  }
+  .gate button:hover{ transform:translateY(-1px); box-shadow:0 10px 24px rgba(255,255,255,.15) }
+  .gate small{ display:block; margin-top:14px; color:rgba(255,255,255,.45); font-family:var(--font-mono); font-size:11px }
+  .gate.hidden{ display:none }
+
+  /* ====== THEMES ====== */
+
+  body[data-theme="minimal"]{
+    --bg:#0b0b0f; --fg:#fafafa; --muted:rgba(250,250,250,.65);
+    --panel-bg:rgba(15,15,18,.45); --panel-border:rgba(255,255,255,.12);
+    --font-display:"Space Grotesk", sans-serif; --font-body:"Inter", sans-serif;
+  }
+  body[data-theme="minimal"] #pixel{ filter:contrast(1.05) }
+  body[data-theme="minimal"] #overlay{
+    background:linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,0) 30%, rgba(0,0,0,.4));
+  }
+
+  body[data-theme="glass"]{
+    --bg:#0a0f1e; --fg:#f5f8ff; --muted:rgba(245,248,255,.7);
+    --panel-bg:rgba(255,255,255,.14); --panel-border:rgba(255,255,255,.28);
+    --font-display:"Space Grotesk", sans-serif; --font-body:"Inter", sans-serif;
+  }
+  body[data-theme="glass"] #pixel{ filter:blur(3px) saturate(1.1) }
+  body[data-theme="glass"] #overlay{
+    background:
+      radial-gradient(900px 500px at 20% 20%, rgba(120,160,255,.28), transparent 60%),
+      radial-gradient(800px 500px at 80% 80%, rgba(255,150,200,.28), transparent 60%),
+      linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,0));
+  }
+  body[data-theme="glass"] .chip.active{ background:rgba(255,255,255,.92); color:#0a0f1e }
+
+  body[data-theme="cyberpunk"]{
+    --bg:#06010a; --fg:#f0f7ff; --muted:rgba(0,255,247,.85);
+    --panel-bg:rgba(8,2,20,.55); --panel-border:rgba(255,0,170,.6);
+    --font-display:"Space Mono", monospace; --font-body:"Space Mono", monospace;
+  }
+  body[data-theme="cyberpunk"] #pixel{ filter:contrast(1.2) saturate(1.4) hue-rotate(var(--hue)) }
+  body[data-theme="cyberpunk"] .stage h1{
+    color:#fff;
+    text-shadow:
+      calc(2px + var(--motion) * 10px) 0 #ff00aa,
+      calc(-2px - var(--motion) * 10px) 0 #00fff7,
+      0 0 24px rgba(255,0,170,.7);
+  }
+  body[data-theme="cyberpunk"] #overlay{
+    background:
+      repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 2px, transparent 2px 4px),
+      radial-gradient(800px 500px at 50% 100%, rgba(255,0,170,.25), transparent 60%),
+      radial-gradient(800px 500px at 50% 0%, rgba(0,255,247,.2), transparent 60%);
+  }
+  body[data-theme="cyberpunk"] .brand{ color:#00fff7; border-color:#00fff7 }
+  body[data-theme="cyberpunk"] .brand .dot{ background:#00fff7; box-shadow:0 0 calc(8px + var(--motion) * 40px) #00fff7 }
+  body[data-theme="cyberpunk"] .meta{ color:#ff00aa; border-color:#ff00aa }
+  body[data-theme="cyberpunk"] .switcher{ border-color:rgba(255,0,170,.5) }
+  body[data-theme="cyberpunk"] .chip{ color:#fff }
+  body[data-theme="cyberpunk"] .chip.active{ background:#ff00aa; color:#fff; box-shadow:0 0 18px rgba(255,0,170,.7) }
+
+  body[data-theme="crt"]{
+    --bg:#000; --fg:#9bff9b; --muted:rgba(155,255,155,.7);
+    --panel-bg:rgba(0,30,0,.5); --panel-border:rgba(155,255,155,.45);
+    --font-display:"VT323", monospace; --font-body:"VT323", monospace;
+  }
+  body[data-theme="crt"] #pixel{ filter:brightness(1.05) contrast(1.2) }
+  body[data-theme="crt"] .stage h1{
+    color:#9bff9b;
+    text-shadow:0 0 6px #6cff6c, 0 0 22px rgba(108,255,108,.6);
+    letter-spacing:.05em; font-size:clamp(48px, 9vw, 120px);
+  }
+  body[data-theme="crt"] .brand, body[data-theme="crt"] .meta{ color:#9bff9b }
+  body[data-theme="crt"] .chip{ color:#9bff9b }
+  body[data-theme="crt"] .chip.active{ background:#9bff9b; color:#001a00 }
+  body[data-theme="crt"] #overlay{
+    background:
+      repeating-linear-gradient(0deg, rgba(0,0,0,.35) 0 2px, transparent 2px 4px),
+      radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,.85) 100%);
+  }
+  body[data-theme="crt"] #vignette{
+    box-shadow: inset 0 0 240px 80px rgba(0,0,0,.9);
+    background:repeating-linear-gradient(90deg, rgba(0,255,0,.04) 0 2px, transparent 2px 3px);
+  }
+
+  body[data-theme="brutalism"]{
+    --bg:#f4f4ec; --fg:#111; --muted:#333;
+    --panel-bg:#fff; --panel-border:#111; --radius:0;
+    --font-display:"Space Mono", monospace; --font-body:"Space Mono", monospace;
+  }
+  body[data-theme="brutalism"] #pixel{ filter:contrast(1.5) }
+  body[data-theme="brutalism"] .brand,
+  body[data-theme="brutalism"] .meta,
+  body[data-theme="brutalism"] .switcher{
+    border-width:2px; box-shadow:6px 6px 0 #111; border-radius:0;
+  }
+  body[data-theme="brutalism"] .chip{ border-radius:0; color:#111; border:2px solid transparent }
+  body[data-theme="brutalism"] .chip:hover{ background:#111; color:#fff }
+  body[data-theme="brutalism"] .chip.active{ background:#111; color:#fff }
+  body[data-theme="brutalism"] .stage h1{
+    color:#111; background:#fff; padding:0 18px;
+    border:3px solid #111; box-shadow:10px 10px 0 #111;
+    text-shadow:none; transform:rotate(calc(-1deg + var(--motion-x) * 2deg)) translate(calc(var(--motion-x) * 14px), calc(var(--motion-y) * 10px));
+    font-weight:700;
+  }
+  body[data-theme="brutalism"] #overlay{
+    background: repeating-linear-gradient(45deg, rgba(0,0,0,.06) 0 8px, transparent 8px 16px);
+  }
+  body[data-theme="brutalism"] #vignette{ display:none }
+
+  body[data-theme="vaporwave"]{
+    --bg:#1a0633; --fg:#fff0ff; --muted:rgba(255,200,255,.85);
+    --panel-bg:rgba(40,10,70,.45); --panel-border:rgba(255,120,220,.55);
+    --font-display:"Major Mono Display", monospace; --font-body:"Space Grotesk", sans-serif;
+  }
+  body[data-theme="vaporwave"] #pixel{ filter:saturate(1.3) }
+  body[data-theme="vaporwave"] .stage h1{
+    background:linear-gradient(180deg, #ff7ad9 0%, #ffd86b 50%, #7ad7ff 100%);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    text-shadow:0 0 30px rgba(255,122,217,.5); letter-spacing:.04em;
+  }
+  body[data-theme="vaporwave"] #overlay{
+    background:
+      linear-gradient(180deg, rgba(255,90,200,.18) 0%, rgba(120,80,255,.18) 60%, rgba(255,200,80,.15) 100%),
+      repeating-linear-gradient(180deg, transparent 0 38px, rgba(255,120,220,.18) 38px 39px),
+      repeating-linear-gradient(90deg, transparent 0 38px, rgba(120,200,255,.16) 38px 39px);
+  }
+  body[data-theme="vaporwave"] .brand{ color:#ffd86b }
+  body[data-theme="vaporwave"] .meta{ color:#7ad7ff }
+  body[data-theme="vaporwave"] .chip.active{ background:#ff7ad9; color:#1a0633 }
+
+  body[data-theme="noir"]{
+    --bg:#0a0a0a; --fg:#f5f1e6; --muted:rgba(245,241,230,.6);
+    --panel-bg:rgba(10,10,10,.55); --panel-border:rgba(245,241,230,.18);
+    --font-display:"Cormorant Garamond", serif; --font-body:"Inter", sans-serif;
+  }
+  body[data-theme="noir"] #pixel{ filter:contrast(1.3) brightness(.9) }
+  body[data-theme="noir"] .stage h1{
+    font-family:"Cormorant Garamond", serif; font-style:italic; font-weight:300;
+    color:#f5f1e6; text-shadow:0 6px 40px rgba(0,0,0,.7); letter-spacing:-.01em;
+  }
+  body[data-theme="noir"] #overlay{
+    background:
+      radial-gradient(closest-side at 50% 50%, transparent 30%, rgba(0,0,0,.55) 80%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 3px);
+  }
+  body[data-theme="noir"] #vignette{ box-shadow: inset 0 0 260px 80px rgba(0,0,0,.85) }
+
+  body[data-theme="arcade"]{
+    --bg:#0d0220; --fg:#fff; --muted:#ffe66d;
+    --panel-bg:rgba(13,2,32,.7); --panel-border:#ffe66d; --radius:6px;
+    --font-display:"Press Start 2P", monospace; --font-body:"Press Start 2P", monospace;
+  }
+  body[data-theme="arcade"] #pixel{ filter:contrast(1.25) saturate(1.2) }
+  body[data-theme="arcade"] .stage h1{
+    font-family:"Press Start 2P", monospace; font-size:clamp(20px, 4.5vw, 56px);
+    color:#ffe66d;
+    text-shadow:
+      calc(4px + var(--motion) * 8px) 0 #ff006e,
+      calc(-4px - var(--motion) * 8px) 0 #3a86ff,
+      0 0 16px rgba(255,230,109,.7);
+    line-height:1.2;
+  }
+  body[data-theme="arcade"] .chip{ font-family:"Press Start 2P", monospace; font-size:10px }
+  body[data-theme="arcade"] .chip.active{ background:#ffe66d; color:#0d0220 }
+  body[data-theme="arcade"] #overlay{
+    background:
+      repeating-linear-gradient(0deg, rgba(0,0,0,.3) 0 2px, transparent 2px 4px),
+      radial-gradient(800px 400px at 50% 100%, rgba(58,134,255,.3), transparent 60%);
+  }
+
+  @media (max-width:560px){
+    .app{ padding:14px }
+    .meta .clock-sep{ display:none }
+    .stage p{ display:none }
+    .meter{ left:14px; bottom:84px; width:100px }
+  }
+</style>
+</head>
+<body data-theme="minimal">
+
+  <video id="cam" autoplay playsinline muted></video>
+  <canvas id="pixel"></canvas>
+  <div id="overlay"></div>
+  <div id="vignette"></div>
+
+  <div class="meter" aria-hidden="true"><i></i></div>
+
+  <div class="gate" id="gate">
+    <div class="card">
+      <h2>Use your motion as the background</h2>
+      <p>Your camera feed is reduced to a low-resolution, color-quantized pixel field — you won't be recognizable. Your <em>motion</em> drives the UI. Everything runs locally; nothing leaves your device.</p>
+      <button id="startBtn">Enable camera</button>
+      <small id="gateError"></small>
+    </div>
+  </div>
+
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="dot"></span>
+        <span>MIRROR / MOTION</span>
+      </div>
+      <div class="meta">
+        <span id="themeName">MINIMAL</span>
+        <span class="clock-sep">·</span>
+        <span id="motionPct">000%</span>
+      </div>
+    </header>
+
+    <section class="stage">
+      <h1 id="bigTitle">MOVE.</h1>
+      <p>Switch themes below. Each style uses a different palette and pixel grain. Your motion shifts the UI.</p>
+    </section>
+
+    <footer class="switcher-wrap">
+      <nav class="switcher" id="switcher" role="tablist" aria-label="Theme switcher">
+        <button class="chip active" data-theme="minimal" data-title="MOVE.">Minimal</button>
+        <button class="chip" data-theme="glass" data-title="SOFT FOCUS.">Glass</button>
+        <button class="chip" data-theme="cyberpunk" data-title="WAKE UP.">Cyberpunk</button>
+        <button class="chip" data-theme="crt" data-title="SIGNAL.">CRT</button>
+        <button class="chip" data-theme="brutalism" data-title="LOUD.">Brutalism</button>
+        <button class="chip" data-theme="vaporwave" data-title="A E S T H E T I C">Vaporwave</button>
+        <button class="chip" data-theme="noir" data-title="In shadow,">Noir</button>
+        <button class="chip" data-theme="arcade" data-title="PLAYER 1">Arcade</button>
+      </nav>
+    </footer>
+  </div>
+
+<script>
+(() => {
+  const cam = document.getElementById('cam');
+  const pixel = document.getElementById('pixel');
+  const pctx = pixel.getContext('2d', { alpha:false });
+  pctx.imageSmoothingEnabled = false;
+
+  const gate = document.getElementById('gate');
+  const gateError = document.getElementById('gateError');
+  const startBtn = document.getElementById('startBtn');
+  const switcher = document.getElementById('switcher');
+  const themeName = document.getElementById('themeName');
+  const bigTitle = document.getElementById('bigTitle');
+  const motionPct = document.getElementById('motionPct');
+
+  // Offscreen low-res buffer
+  const low = document.createElement('canvas');
+  const lctx = low.getContext('2d', { willReadFrequently:true });
+
+  // Per-theme rendering configs
+  // pxW = horizontal resolution (smaller = chunkier, less recognizable)
+  // palette = array of [r,g,b]; null means keep color, just quantize to N levels
+  // levels = quantization steps per channel if palette is null
+  // dither = enable ordered (Bayer 4x4) dithering toward nearest palette
+  const THEMES = {
+    minimal:   { pxW:60, palette:null,  levels:5,  dither:false },
+    glass:     { pxW:54, palette:[
+                  [22,30,55],[60,90,140],[120,160,210],[200,220,250],
+                  [255,200,220],[150,90,170],[240,240,255],[20,20,30]
+                ], dither:true },
+    cyberpunk: { pxW:64, palette:[
+                  [10,2,18],[40,5,55],[180,0,140],[255,0,170],
+                  [255,90,200],[0,180,200],[0,255,247],[240,240,255]
+                ], dither:true },
+    crt:       { pxW:90, palette:[
+                  [0,8,0],[0,30,0],[0,70,0],[10,120,20],
+                  [40,180,50],[120,240,120],[200,255,200],[240,255,240]
+                ], dither:true },
+    brutalism: { pxW:44, palette:[[10,10,10],[245,245,238]], dither:true },
+    vaporwave: { pxW:72, palette:[
+                  [20,5,45],[90,30,140],[200,80,200],[255,120,220],
+                  [255,200,140],[255,230,110],[120,200,255],[230,240,255]
+                ], dither:true },
+    noir:      { pxW:64, palette:[
+                  [5,5,5],[30,30,30],[70,70,70],[120,120,120],
+                  [170,170,170],[210,210,210],[235,235,235],[252,252,250]
+                ], dither:true },
+    arcade:    { pxW:48, palette:[
+                  [13,2,32],[58,134,255],[0,200,160],[255,230,109],
+                  [255,0,110],[200,40,160],[240,240,240],[0,0,0]
+                ], dither:true },
+  };
+
+  // 4x4 Bayer matrix, normalized to [-0.5..0.5)
+  const BAYER = [
+    [ 0, 8, 2,10],
+    [12, 4,14, 6],
+    [ 3,11, 1, 9],
+    [15, 7,13, 5],
+  ].map(r => r.map(v => v/16 - 0.5));
+
+  let prevLow = null;     // Uint8ClampedArray of previous low-res frame (rgba)
+  let motion = 0;         // 0..1 smoothed
+  let mx = 0, my = 0;     // -1..1 smoothed bias
+  let hue = 0;
+  let currentTheme = 'minimal';
+  let lowW = 60, lowH = 34;
+
+  function fitPixelCanvas(){
+    // backing store matches display, but we'll always draw via low-res buffer
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    pixel.width  = Math.floor(window.innerWidth  * dpr);
+    pixel.height = Math.floor(window.innerHeight * dpr);
+    pixel.style.width  = '100%';
+    pixel.style.height = '100%';
+    pctx.imageSmoothingEnabled = false;
+  }
+  window.addEventListener('resize', fitPixelCanvas);
+  fitPixelCanvas();
+
+  function setLowSize(theme){
+    const cfg = THEMES[theme] || THEMES.minimal;
+    lowW = cfg.pxW;
+    // pick aspect from screen, not from camera, so it fills nicely
+    const aspect = window.innerHeight / window.innerWidth;
+    lowH = Math.max(16, Math.round(lowW * aspect));
+    low.width = lowW; low.height = lowH;
+    prevLow = null;
+  }
+  setLowSize(currentTheme);
+  window.addEventListener('resize', () => setLowSize(currentTheme));
+
+  function nearestPaletteIndex(r,g,b, palette){
+    let best = 0, bestD = Infinity;
+    for(let i=0;i<palette.length;i++){
+      const p = palette[i];
+      const dr=r-p[0], dg=g-p[1], db=b-p[2];
+      const d = dr*dr + dg*dg + db*db;
+      if(d < bestD){ bestD = d; best = i; }
+    }
+    return best;
+  }
+
+  function quantizeAndDither(data, w, h, cfg){
+    if(cfg.palette){
+      const pal = cfg.palette;
+      const useDither = !!cfg.dither;
+      for(let y=0;y<h;y++){
+        for(let x=0;x<w;x++){
+          const i = (y*w + x) * 4;
+          let r = data[i], g = data[i+1], b = data[i+2];
+          if(useDither){
+            const t = BAYER[y & 3][x & 3] * 48; // strength
+            r = Math.max(0, Math.min(255, r + t));
+            g = Math.max(0, Math.min(255, g + t));
+            b = Math.max(0, Math.min(255, b + t));
+          }
+          const idx = nearestPaletteIndex(r,g,b, pal);
+          const p = pal[idx];
+          data[i] = p[0]; data[i+1] = p[1]; data[i+2] = p[2];
+        }
+      }
+    } else {
+      // simple posterize per channel
+      const steps = Math.max(2, cfg.levels|0);
+      const step = 255 / (steps - 1);
+      for(let i=0;i<data.length;i+=4){
+        data[i]   = Math.round(data[i]   / step) * step;
+        data[i+1] = Math.round(data[i+1] / step) * step;
+        data[i+2] = Math.round(data[i+2] / step) * step;
+      }
+    }
+  }
+
+  function computeMotion(curr, w, h){
+    // sums by quadrant
+    let total = 0;
+    let leftSum = 0, rightSum = 0, topSum = 0, bottomSum = 0;
+    let count = 0;
+    if(!prevLow || prevLow.length !== curr.length){
+      prevLow = new Uint8ClampedArray(curr);
+      return { m:0, mx:0, my:0 };
+    }
+    const halfW = w >> 1, halfH = h >> 1;
+    for(let y=0;y<h;y++){
+      for(let x=0;x<w;x++){
+        const i = (y*w + x) * 4;
+        // luminance diff
+        const lc = (curr[i]*0.299 + curr[i+1]*0.587 + curr[i+2]*0.114);
+        const lp = (prevLow[i]*0.299 + prevLow[i+1]*0.587 + prevLow[i+2]*0.114);
+        const d = Math.abs(lc - lp);
+        if(d > 18){ // noise floor
+          total += d;
+          if(x < halfW) leftSum += d; else rightSum += d;
+          if(y < halfH) topSum += d;  else bottomSum += d;
+        }
+        count++;
+      }
+    }
+    // copy current -> prev
+    prevLow.set(curr);
+
+    // normalize: average diff per pixel across the threshold-passing set
+    const avgPerPx = total / (count * 64); // 64 ≈ rough scale → 0..~1
+    const m = Math.max(0, Math.min(1, avgPerPx));
+    const dx = (rightSum - leftSum) / (total + 1);  // -1..1
+    const dy = (bottomSum - topSum) / (total + 1);
+    return { m, mx:dx, my:dy };
+  }
+
+  function draw(){
+    if(cam.readyState >= 2 && cam.videoWidth > 0){
+      // draw mirrored, scaled into low-res buffer (cover)
+      const vw = cam.videoWidth, vh = cam.videoHeight;
+      const targetAspect = lowW / lowH;
+      const srcAspect = vw / vh;
+      let sx, sy, sw, sh;
+      if(srcAspect > targetAspect){
+        // video is wider; crop sides
+        sh = vh; sw = vh * targetAspect; sx = (vw - sw) / 2; sy = 0;
+      } else {
+        sw = vw; sh = vw / targetAspect; sx = 0; sy = (vh - sh) / 2;
+      }
+      lctx.save();
+      lctx.translate(lowW, 0); lctx.scale(-1, 1); // mirror
+      lctx.drawImage(cam, sx, sy, sw, sh, 0, 0, lowW, lowH);
+      lctx.restore();
+
+      const img = lctx.getImageData(0, 0, lowW, lowH);
+      const cfg = THEMES[currentTheme] || THEMES.minimal;
+
+      // motion from raw (less affected by quantization snap)
+      const mm = computeMotion(img.data, lowW, lowH);
+      // EMA smoothing
+      motion = motion * 0.78 + mm.m * 0.22;
+      mx = mx * 0.85 + mm.mx * 0.15;
+      my = my * 0.85 + mm.my * 0.15;
+
+      // quantize
+      quantizeAndDither(img.data, lowW, lowH, cfg);
+      lctx.putImageData(img, 0, 0);
+
+      // upscale to fullscreen canvas (no smoothing -> pixelated)
+      pctx.imageSmoothingEnabled = false;
+      pctx.clearRect(0, 0, pixel.width, pixel.height);
+      pctx.drawImage(low, 0, 0, pixel.width, pixel.height);
+
+      // push to CSS
+      const root = document.documentElement;
+      const mDisp = Math.min(1, motion * 1.6);
+      root.style.setProperty('--motion', mDisp.toFixed(3));
+      root.style.setProperty('--motion-x', Math.max(-1, Math.min(1, mx * 2)).toFixed(3));
+      root.style.setProperty('--motion-y', Math.max(-1, Math.min(1, my * 2)).toFixed(3));
+
+      hue = (hue + mDisp * 6) % 360;
+      root.style.setProperty('--hue', hue.toFixed(1) + 'deg');
+
+      motionPct.textContent = String(Math.round(mDisp * 100)).padStart(3,'0') + '%';
+    }
+    requestAnimationFrame(draw);
+  }
+
+  async function startCamera(){
+    gateError.textContent = '';
+    try{
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode:'user', width:{ ideal:640 }, height:{ ideal:360 } },
+        audio: false
+      });
+      cam.srcObject = stream;
+      await cam.play();
+      gate.classList.add('hidden');
+      requestAnimationFrame(draw);
+    } catch(err){
+      gateError.textContent = err.name === 'NotAllowedError'
+        ? 'Permission denied. Allow camera access in your browser and try again.'
+        : (err.message || String(err));
+    }
+  }
+  startBtn.addEventListener('click', startCamera);
+
+  switcher.addEventListener('click', (e) => {
+    const btn = e.target.closest('.chip');
+    if(!btn) return;
+    currentTheme = btn.dataset.theme;
+    document.body.dataset.theme = currentTheme;
+    setLowSize(currentTheme);
+    switcher.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c === btn));
+    themeName.textContent = btn.textContent.trim().toUpperCase();
+    if(btn.dataset.title) bigTitle.textContent = btn.dataset.title;
+    try{ localStorage.setItem('mirror-theme', currentTheme); }catch(_){}
+  });
+
+  try{
+    const saved = localStorage.getItem('mirror-theme');
+    if(saved){
+      const btn = switcher.querySelector(`.chip[data-theme="${saved}"]`);
+      if(btn) btn.click();
+    }
+  }catch(_){}
+
+  document.addEventListener('keydown', (e) => {
+    const idx = parseInt(e.key, 10);
+    if(idx >= 1 && idx <= 9){
+      const chips = switcher.querySelectorAll('.chip');
+      if(chips[idx-1]) chips[idx-1].click();
+    }
+  });
+})();
+</script>
+</body>
+</html>
