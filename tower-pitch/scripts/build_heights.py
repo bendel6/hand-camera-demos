@@ -19,7 +19,12 @@ t = np.clip((r - 120.0) / (280.0 - 120.0), 0, 1)
 HT = raw * (t * t * (3 - 2 * t))
 out = geo.ROOT / "public" / "data"
 out.mkdir(parents=True, exist_ok=True)
-np.round(HT * 10).astype("<i2").tofile(out / "heights.bin")
+from PIL import Image
+v = (np.round(HT * 10).astype(np.int32) + 32768).clip(0, 65535)
+rgb = np.zeros((NY, NX, 3), np.uint8)
+rgb[..., 0] = v >> 8
+rgb[..., 1] = v & 255
+Image.fromarray(rgb).save(out / "heights.png", optimize=True)  # R = high byte, G = low byte (dm + 32768)
 json.dump({"nx": NX, "ny": NY, "e0": E0, "e1": E1, "n0": N0, "n1": N1, "unit": "dm", "rows": "north (row 0 = n0)",
            "h0_asl": H0}, open(geo.ROOT / "src" / "content" / "heights.json", "w"), indent=1)
 print("heights", HT.min(), HT.max(), "H0", H0)

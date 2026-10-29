@@ -9,3 +9,4 @@ dist/
 input/*.pdf
 node_modules/
 public/assets/pdf/raw/
+dist-artifact/

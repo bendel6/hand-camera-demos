@@ -7,6 +7,7 @@ import poiData from '../content/poi.json';
 import routesData from '../content/routes.json';
 import heightsMeta from '../content/heights.json';
 import { SITE_CENTRE } from './coords';
+import { BASE } from '../base';
 
 export type Category = 'Transport' | 'Shopping' | 'Education' | 'Health' | 'Leisure' | 'Business' | 'Landmark';
 export const CATEGORY_COLOURS: Record<Category, string> = {
@@ -44,8 +45,18 @@ export const POI_META = (poiData as any).meta;
 export class Heights {
   data: Int16Array | null = null;
   async load() {
-    const buf = await (await fetch('/data/heights.bin')).arrayBuffer();
-    this.data = new Int16Array(buf);
+    // heights.png: R = high byte, G = low byte of (decimetres + 32768); decoded via canvas (same-origin)
+    const img = new Image();
+    img.src = `${BASE}data/heights.png`;
+    await img.decode();
+    const c = document.createElement('canvas');
+    c.width = img.width;
+    c.height = img.height;
+    const g = c.getContext('2d', { willReadFrequently: true })!;
+    g.drawImage(img, 0, 0);
+    const px = g.getImageData(0, 0, c.width, c.height).data;
+    this.data = new Int16Array(c.width * c.height);
+    for (let i = 0; i < this.data.length; i++) this.data[i] = px[i * 4] * 256 + px[i * 4 + 1] - 32768;
   }
   at(x: number, z: number): number {
     if (!this.data) return 0;
@@ -85,7 +96,7 @@ void main() {
   float edge = 1.0 - abs(vUv.y - 0.5) * 2.0;
   float dash = 0.65 + 0.35 * step(0.5, fract(vUv.x * 90.0 - uT * 0.6));
   float pulse = 0.75 + 0.25 * sin(uT * 2.0 - vUv.y * 3.0);
-  gl_FragColor = vec4(uCol * 1.8 * pulse, pow(edge, 1.5) * dash * 0.8 * uA);
+  gl_FragColor = vec4(uCol * 2.4 * pulse, pow(edge, 1.2) * dash * 0.9 * uA);
 }`;
 
 export class Location {
@@ -122,7 +133,7 @@ export class Location {
       const y = H.at(x, z);
       p.y = y;
       const hgt = 90 + Math.min(p.straight_m / 40, 140);
-      const geo = new THREE.CylinderGeometry(3.5, 3.5, hgt, 12, 1, true);
+      const geo = new THREE.CylinderGeometry(6, 6, hgt, 12, 1, true);
       geo.translate(0, hgt / 2, 0);
       const beam = new THREE.Mesh(geo, beamMaterial(col));
       beam.position.set(x, y, z);
@@ -144,7 +155,7 @@ export class Location {
     ];
     for (const [r, label, key] of rings) {
       const seg = Math.round(64 + r / 25);
-      const w = 4 + r / 260;
+      const w = 6 + r / 180;
       const pos: number[] = [];
       const uv: number[] = [];
       const idx: number[] = [];

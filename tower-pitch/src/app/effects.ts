@@ -121,15 +121,29 @@ export class Effects {
     return new Promise((res) => tl.eventCallback('onComplete', () => res()));
   }
 
+  private anchorBox = new THREE.Box3();
+  /** Label anchors on representative nodes of each layer (follow the exploded positions). */
   layerLabelPositions(): Array<{ id: string; pos: THREE.Vector3 }> {
-    return LAYERS.map((L) => {
-      const c = this.layerCentre(L.id);
-      if (L.id === 'facade' || L.id === 'glazing') c.add(siteDir(0, L.id === 'facade' ? -22 : -12, 0)).setY(L.id === 'facade' ? 70 : 52);
-      if (L.id === 'columns') c.setY(30);
-      if (L.id === 'slabs') c.setY(85);
-      if (L.id === 'cores') c.setY(100);
-      return { id: L.id, pos: c };
-    });
+    const anchors: Record<string, [string, number]> = {
+      facade: ['B_facade_S', 0.75],
+      glazing: ['B_glazing_E', 0.55],
+      roof: ['A_crown', 1.0],
+      slabs: ['A_slabs', 0.62],
+      columns: ['B_columns', 0.35],
+      cores: ['A_core', 0.9],
+      foundation: ['Foundation', 0.5],
+    };
+    const out: Array<{ id: string; pos: THREE.Vector3 }> = [];
+    for (const L of LAYERS) {
+      const [name, fy] = anchors[L.id];
+      const node = this.layerNodes.get(L.id)!.find((n) => n.name === name) ?? this.layerNodes.get(L.id)![0];
+      if (!node) continue;
+      this.anchorBox.setFromObject(node);
+      const c = this.anchorBox.getCenter(new THREE.Vector3());
+      c.y = THREE.MathUtils.lerp(this.anchorBox.min.y, this.anchorBox.max.y, fy);
+      out.push({ id: L.id, pos: c });
+    }
+    return out;
   }
 
   meshesOfLayer(id: string): THREE.Object3D[] {

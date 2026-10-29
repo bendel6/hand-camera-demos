@@ -13,6 +13,7 @@ import { INTERIOR } from './materials';
 import { FX } from './fx';
 import { SITE_CENTRE, siteToWorld } from './coords';
 import type { UI } from '../ui/ui';
+import { BASE } from '../base';
 
 export type Mode = 'overview' | 'location' | 'structure' | 'parking' | 'buildup' | 'greenery' | 'compare';
 
@@ -25,11 +26,11 @@ export interface ScreenLabel {
 }
 
 export const HOTSPOTS: Array<{ id: string; at: THREE.Vector3; view: View; image?: string }> = [
-  { id: 'entrance', at: siteToWorld(44, -0.5, 6), view: VIEWS.entrance, image: '/assets/pdf/render-p08.webp' },
-  { id: 'parking', at: siteToWorld(46.4, 50, 4), view: view(70, 110, 32, 46, 48, 2), image: '/assets/pdf/siteplan.webp' },
-  { id: 'green', at: siteToWorld(66, 50, 5), view: VIEWS.green, image: '/assets/pdf/siteplan.webp' },
-  { id: 'rooftop', at: siteToWorld(25, 14, 12), view: VIEWS.rooftop, image: '/assets/pdf/render-p05.webp' },
-  { id: 'facade', at: siteToWorld(61, 2.1, 42), view: VIEWS.facade, image: '/assets/pdf/render-p07.webp' },
+  { id: 'entrance', at: siteToWorld(44, -0.5, 6), view: VIEWS.entrance, image: `${BASE}assets/pdf/render-p08.webp` },
+  { id: 'parking', at: siteToWorld(46.4, 50, 4), view: view(70, 110, 32, 46, 48, 2), image: `${BASE}assets/pdf/siteplan.webp` },
+  { id: 'green', at: siteToWorld(66, 50, 5), view: VIEWS.green, image: `${BASE}assets/pdf/siteplan.webp` },
+  { id: 'rooftop', at: siteToWorld(25, 14, 12), view: VIEWS.rooftop, image: `${BASE}assets/pdf/render-p05.webp` },
+  { id: 'facade', at: siteToWorld(61, 2.1, 42), view: VIEWS.facade, image: `${BASE}assets/pdf/render-p07.webp` },
 ];
 
 export class App {
@@ -116,7 +117,7 @@ export class App {
     } else {
       // open-data city model (Overture + terrain), loaded in the background
       this.models.loadContext().then(async () => {
-        const res = await fetch('/data/trees-near.json').catch(() => null);
+        const res = await fetch(`${BASE}data/trees-near.json`).catch(() => null);
         if (res && res.ok) {
           const d = await res.json();
           this.life.addContextTrees(this.models.props, d.trees);
@@ -156,7 +157,7 @@ export class App {
         m.emissiveIntensity = base[name] * THREE.MathUtils.smoothstep(n, 0.15, 0.6);
       }
     }
-    this.post.grade.exposure = THREE.MathUtils.lerp(0.68, 1.55, n) * THREE.MathUtils.lerp(1, 1.3, this.env.golden);
+    this.post.grade.exposure = THREE.MathUtils.lerp(0.68, 1.55, n) * THREE.MathUtils.lerp(1, 1.3, this.env.golden) * this.mapLook;
     this.post.bloom.intensity = THREE.MathUtils.lerp(0.45, 1.05, n);
   }
 
@@ -178,6 +179,9 @@ export class App {
       this.location.show(false);
       this.location.clearRoute();
       gsap.to((this.scene.fog as THREE.FogExp2), { density: 0.000075, duration: 1.5 });
+      gsap.to(this.post.grade.uniforms.get('saturation')!, { value: 1.12, duration: 1.5 });
+      this.mapLook = 1;
+      this.onLighting();
     }
     if (prev === 'structure' && mode !== 'structure') {
       if (this.effects.exploded) await this.effects.setExplode(false);
@@ -201,6 +205,10 @@ export class App {
         if (this.tiles) this.tiles.setVisible(true);
         else this.models.loadContext();
         gsap.to(this.scene.fog as THREE.FogExp2, { density: 0.000045, duration: 2 });
+        // slightly subdued map so pins, routes and rings read clearly
+        gsap.to(this.post.grade.uniforms.get('saturation')!, { value: 0.92, duration: 2 });
+        this.mapLook = 0.82;
+        this.onLighting();
         await this.flight.to(VIEWS.location, 4.5);
         break;
       case 'structure':
@@ -275,6 +283,7 @@ export class App {
     this.compareActive = on;
   }
   compareActive = false;
+  mapLook = 1;
 
   async explode(on: boolean) {
     if (this.mode !== 'structure') await this.setMode('structure');

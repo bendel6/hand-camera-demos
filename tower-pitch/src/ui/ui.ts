@@ -8,19 +8,20 @@ import { fmtTime } from '../app/environment';
 import parkingLayout from '../content/parking-layout.json';
 import { Ambient } from './audio';
 import { Recorder } from './recorder';
+import { BASE, MODEL_SUFFIX } from '../base';
 
 type Lang = 'en' | 'ka';
 const STRINGS: Record<Lang, any> = { en, ka };
 
 const GALLERY = [
-  { src: '/assets/pdf/render-p05.webp', group: 'renders' },
-  { src: '/assets/pdf/render-p07.webp', group: 'renders' },
-  { src: '/assets/pdf/render-p08.webp', group: 'renders' },
-  { src: '/assets/pdf/render-p06.webp', group: 'renders' },
-  { src: '/assets/pdf/montage-p09.webp', group: 'renders' },
-  { src: '/assets/pdf/montage-p10.webp', group: 'renders' },
-  { src: '/assets/pdf/render-p01.webp', group: 'renders' },
-  { src: '/assets/pdf/siteplan.webp', group: 'renders' },
+  { src: `${BASE}assets/pdf/render-p05.webp`, group: 'renders' },
+  { src: `${BASE}assets/pdf/render-p07.webp`, group: 'renders' },
+  { src: `${BASE}assets/pdf/render-p08.webp`, group: 'renders' },
+  { src: `${BASE}assets/pdf/render-p06.webp`, group: 'renders' },
+  { src: `${BASE}assets/pdf/montage-p09.webp`, group: 'renders' },
+  { src: `${BASE}assets/pdf/montage-p10.webp`, group: 'renders' },
+  { src: `${BASE}assets/pdf/render-p01.webp`, group: 'renders' },
+  { src: `${BASE}assets/pdf/siteplan.webp`, group: 'renders' },
 ];
 
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls = '', html = ''): HTMLElementTagNameMap[K] {
@@ -127,6 +128,8 @@ export class UI {
     });
     top.querySelector('.present')!.addEventListener('click', () => this.togglePresent());
     top.querySelector('.rec')!.addEventListener('click', () => this.record());
+    // the claude.ai preview frame cannot save files, so recording is only offered on the real site
+    if (MODEL_SUFFIX) (top.querySelector('.rec') as HTMLElement).style.display = 'none';
     document.addEventListener('fullscreenchange', () => {
       if (!document.fullscreenElement && this.app.present) this.togglePresent(false);
     });

@@ -4,6 +4,7 @@ import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { upgradeMaterials, INTERIOR } from './materials';
 import { applyFx } from './fx';
 import { SITE_ROT } from './coords';
+import { BASE, MODEL_SUFFIX } from '../base';
 
 export type ProgressFn = (label: string, frac: number) => void;
 
@@ -39,9 +40,9 @@ export class Models {
 
   async loadCore(progress: ProgressFn) {
     const parts: Array<[string, string]> = [
-      ['building', '/models/building.glb'],
-      ['site', '/models/site.glb'],
-      ['props', '/models/props.glb'],
+      ['building', `${BASE}models/building.glb${MODEL_SUFFIX}`],
+      ['site', `${BASE}models/site.glb${MODEL_SUFFIX}`],
+      ['props', `${BASE}models/props.glb${MODEL_SUFFIX}`],
     ];
     const fracs = parts.map(() => 0);
     const report = (label: string) => progress(label, fracs.reduce((a, b) => a + b, 0) / parts.length);
@@ -77,7 +78,7 @@ export class Models {
 
   loadParking(): Promise<THREE.Group> {
     if (!this.parkingPromise) {
-      this.parkingPromise = this.load('/models/parking.glb').then((g) => {
+      this.parkingPromise = this.load(`${BASE}models/parking.glb${MODEL_SUFFIX}`).then((g) => {
         this.parking = g.scene;
         upgradeMaterials(this.parking, 'parking');
         this.index(this.parking);
@@ -91,8 +92,8 @@ export class Models {
   loadContext(progress?: (f: number) => void): Promise<THREE.Group> {
     if (!this.contextPromise) {
       this.contextPromise = Promise.all([
-        this.load('/models/context.glb', progress),
-        new THREE.TextureLoader().loadAsync('/textures/ground.webp'),
+        this.load(`${BASE}models/context.glb${MODEL_SUFFIX}`, progress),
+        new THREE.TextureLoader().loadAsync(`${BASE}textures/ground.webp`),
       ]).then(([g, tex]) => {
         const root = g.scene;
         tex.flipY = false;

@@ -1,4 +1,5 @@
 :root {
+  color-scheme: dark;
   --accent: #d9946a;
   --accent-2: #f2c3a2;
   --ink: #f4f1ec;
@@ -164,3 +165,14 @@ body.recording .card, body.recording .labels, body.recording .topbar { opacity: 
 
 .card .lvl.on { background: rgba(217,148,106,0.14); box-shadow: inset 0 0 0 1px rgba(217,148,106,0.4); }
 .lbl-level.cur b { box-shadow: 0 0 0 2px #fff, 0 0 18px var(--c); }
+
+/* narrow windows: keep the chrome usable (the experience targets desktop) */
+@media (max-width: 900px) {
+  .numbers { display: none; }
+  .nav { left: 12px; right: 12px; transform: none; overflow-x: auto; justify-content: flex-start; }
+  .nav button { min-width: 70px; padding: 8px 8px 7px; }
+  .card, .locpanel { left: 12px; right: 12px; width: auto; top: auto; bottom: 110px; max-height: 45vh; }
+  .help, .attr, .tool span { display: none; }
+  .subnav { left: 12px; right: 12px; transform: none; flex-wrap: wrap; }
+  .time input { width: 160px; }
+}

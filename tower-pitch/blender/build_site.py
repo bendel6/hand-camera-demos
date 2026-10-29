@@ -30,6 +30,8 @@ ACCESS_W = (0.0, 5.7)            # west access road x-range (site plan)
 ACCESS_N = (58.1, 64.2)          # north leg y-range
 ACCESS_E = (43.7, 49.0)          # east leg x-range (to the ramp portal at the podium face)
 PLAY = (61.9, 25.1, 6.8)
+_FP = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "near-footprints.json")
+FOOTPRINTS = unary_union([Polygon(f["poly"]).buffer(0) for f in json.load(open(_FP))]) if os.path.exists(_FP) else None
 
 
 def materials():
@@ -107,7 +109,13 @@ def main():
         curb(P["S_road"], LineString([(X0, yy), (X1, yy)]), 0.0, 0.16, 0.3, M["curb"])
     # green strip across the avenue: lawn + low fence + paths
     gs = box(X0, GREEN_S[0], X1, GREEN_S[1])
-    path_s = box(X0, -37.0, X1, -34.6)
+    path_s = box(X0, -39.6, X1, -37.2)
+    if FOOTPRINTS is not None:
+        # real buildings stand south of the avenue: keep the lawn and path out of them (+ a paved apron)
+        fp = FOOTPRINTS.buffer(2.5, join_style=2)
+        surf(P["S_ground"], fp.intersection(gs), 0.05, M["sidewalk"])
+        gs = gs.difference(fp)
+        path_s = path_s.difference(fp)
     surf(P["S_ground"], gs.difference(path_s), 0.05, M["grass"])
     surf(P["S_ground"], path_s, 0.06, M["flag"])
     for yy in (GREEN_S[1] - 0.4,):
@@ -229,8 +237,13 @@ def main():
     for x in range(int(X0) + 2, int(X1), 8):            # south sidewalk
         trees.append({"t": "Tree_plane", "x": x, "y": -23.6, "z": 0.15, "s": round(0.8 + rnd.random() * 0.35, 2),
                       "r": round(rnd.random() * 6.28, 2)})
-    for row_y in (-30.0, -42.0, -50.0):                 # green strip rows (p10 photomontage)
+    def free(x, y, r=3.0):
+        return FOOTPRINTS is None or not FOOTPRINTS.buffer(r).contains(Point(x, y))
+
+    for row_y in (-30.0, -44.0, -52.0):                 # green strip rows (p10 photomontage)
         for x in range(int(X0), int(X1), 7):
+            if not free(x, row_y):
+                continue
             kind = "Tree_cypress" if (x // 7) % 5 == 0 and row_y == -42.0 else "Tree_plane2"
             trees.append({"t": kind, "x": x + rnd.uniform(-1.5, 1.5), "y": row_y + rnd.uniform(-1.5, 1.5),
                           "z": 0.05, "s": round(0.75 + rnd.random() * 0.4, 2), "r": round(rnd.random() * 6.28, 2)})
@@ -252,7 +265,7 @@ def main():
     people_paths = [
         [[X0 + 20, -1.6], [X1 - 20, -1.6]], [[X1 - 20, -3.0], [X0 + 20, -3.0]],
         [[X0 + 20, -23.0], [X1 - 20, -23.0]], [[X1 - 20, -24.4], [X0 + 20, -24.4]],
-        [[X0 + 20, -35.8], [X1 - 20, -35.8]],
+        [[-4.0, -38.4], [138.0, -38.4]],
         [[44.0, -1.0], [44.0, -4.5], [30.0, -4.5]], [[56, 52.5], [62, 57.5], [70, 59.5], [77, 56], [79.5, 48]],
         [[52, 40], [58, 45], [66, 47.5], [74, 46], [79, 41]],
     ]

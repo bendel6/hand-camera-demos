@@ -5,6 +5,7 @@ import '@fontsource/noto-sans-georgian/500.css';
 import './styles.css';
 import { App } from './app/App';
 import { UI } from './ui/ui';
+import { BASE } from './base';
 
 async function boot() {
   const canvas = document.getElementById('scene') as HTMLCanvasElement;
@@ -15,7 +16,7 @@ async function boot() {
   app.ui = ui;
   (window as any).__app = app;
   // rendered stills (Cycles) for the gallery, if present
-  fetch('/assets/stills/index.json')
+  fetch(`${BASE}assets/stills/index.json`)
     .then((r) => (r.ok ? r.json() : []))
     .then((list) => ((window as any).__STILLS__ = list))
     .catch(() => {});

@@ -211,7 +211,7 @@ class ContextTrees {
       const sx = e * c + n * s, sy = -e * s + n * c;
       return !(sx > -175 && sx < 265 && sy > -62 && sy < 72);
     });
-    const ip = new InstancedProto(proto, keep.length, this.group, { shadow: true });
+    const ip = new InstancedProto(proto, keep.length, this.group, { shadow: false });
     keep.forEach(([x, y, z, s], i) => {
       tmpP.set(x, y, z);
       tmpQ.setFromAxisAngle(UP, (i * 2.399) % (Math.PI * 2));
