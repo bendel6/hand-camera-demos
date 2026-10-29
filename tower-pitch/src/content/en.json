@@ -84,6 +84,7 @@
     "stopTour": "Stop tour",
     "walk": "walk",
     "drive": "drive",
+    "transit": "metro / bus",
     "straight": "straight line",
     "estimates": "Network distances from open map data. Travel times are estimates.",
     "rings": { "walk6": "≈6 min walk", "walk12": "≈12 min walk", "drive7": "≈7 min drive", "drive12": "≈12 min drive" },

@@ -421,9 +421,11 @@ export class UI {
     const rows = [
       p.walk_m != null && p.walk_m < 6000 ? `<div><b>${p.walk_min} ${u.min}</b><span>${t.walk} · ${fmt(p.walk_m)}</span></div>` : '',
       p.drive_m != null ? `<div><b>${p.approximate ? '≈' : ''}${p.drive_min} ${u.min}</b><span>${t.drive} · ${fmt(p.drive_m)}</span></div>` : '',
-      `<div><b>${fmt(p.straight_m)}</b><span>${t.straight}</span></div>`,
+      (p as any).transit_min != null ? `<div><b>${(p as any).transit_min} ${u.min}</b><span>${t.transit}</span></div>` : `<div><b>${fmt(p.straight_m)}</b><span>${t.straight}</span></div>`,
     ].join('');
-    this.openCard(`<p class="cat" style="--c:${CATEGORY_COLOURS[p.category]}">${t.categories[p.category]}</p><h2>${this.poiName(p)}</h2><div class="stats">${rows}</div><p class="fine">${t.estimates}</p>`);
+    const photo = (p as any).photo ? `<img src="${BASE}${(p as any).photo}" alt=""><p class="fine">© ${(p as any).photo_credit || 'Google'}</p>` : '';
+    const note = (p as any).source === 'google-routes' ? POI_META.note : t.estimates;
+    this.openCard(`<p class="cat" style="--c:${CATEGORY_COLOURS[p.category]}">${t.categories[p.category]}</p><h2>${this.poiName(p)}</h2><div class="stats">${rows}</div>${photo}<p class="fine">${note}</p>`);
   }
 
   showPhase(i: number) {

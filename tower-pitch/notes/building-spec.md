@@ -104,3 +104,24 @@ Each tower facade is split into two zones:
 ## Not yet known (need the client)
 Project and developer name, logo, brand colour, contact details, construction dates, selling points, POI wishes,
 confirmation of the parking levels, and real GFA.
+
+## Model decisions made during the build (ASSUMED unless stated)
+- **Crowns.** Tower A: the frame and crown panel rise from +109.8 (NE corner) to +115.0 (SW corner) on a concave
+  curve. The fins stand 1.6 m proud of that line, which gives the stepped sawtooth seen in renders p05/p10.
+  Tower B: the peak (+68.0) sits at the fin/frame boundary (x = 50.5). The frame falls east to +66.0 and the fins
+  step down west, as in render p07.
+- **Facade split.** Tower A has fins on S and N and framed balconies on E and W. Tower B: the S and N faces have
+  fins west of x = 50.5 and framed balconies east of it; the W face has fins and the E face framed balconies.
+- **Podium.** Red top fascia 8.3–9.6 m, mid band 4.6–5.55 m. The main lobby sits between red portals at
+  x 35.0–36.8 and 52.0–53.8, where the mid band is omitted (double height). A glass balustrade runs round the
+  terrace.
+- **Parking.** Three underground levels at −3.6 / −7.2 / −10.8 on an 8.1 m column grid with 16.2 m
+  double-loaded modules. Layout: 117 / 117 / 116 bays, 4 accessible and 8 EV bays per level. B1 is commercial,
+  B2–B3 residential. A straight two-way ramp (x 43.2–49.6, y 24.4–46.4) enters from the north drive loop under
+  the podium.
+- **Street.** Kazbegi Ave is mapped (Overture) as one east-bound carriageway with its centreline 14.9 m from the
+  frontage. Modelled as 4 lanes (15 m), with 6.4 m and 4 m sidewalks, street trees, lamps and a zebra crossing
+  in front of the lobby. The strip across the avenue is lawn and tree rows, kept clear of the real buildings
+  there (Overture footprints).
+- **Existing site ("before").** Four low buildings (1–5 floors) traced from cadastral plan 01.10.15.010.016.
+- **Gross area 37,400 m², green area 18%.** These are model estimates and should be confirmed by the architect.
