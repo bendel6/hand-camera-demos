@@ -24,6 +24,8 @@ export class GoogleTiles {
   private flatten: TileFlatteningPlugin;
   private aligned = false;
   private raycaster = new THREE.Raycaster();
+  private holder = new THREE.Group();
+  private frame = 0;
   attribution = '';
 
   constructor(private scene: THREE.Scene, private camera: THREE.PerspectiveCamera, renderer: THREE.WebGLRenderer, apiKey: string) {
@@ -49,12 +51,18 @@ export class GoogleTiles {
     tiles.setResolutionFromRenderer(camera, renderer);
     tiles.errorTarget = 6;
     tiles.group.name = 'GoogleTiles';
-    tiles.group.visible = false;
-    scene.add(tiles.group);
+    // ReorientationPlugin yields an object frame with +X west and +Z north; the app uses +X east and -Z north,
+    // so the tileset sits in a holder turned half a revolution about the up axis.
+    this.holder.name = 'GoogleTilesHolder';
+    this.holder.rotation.y = Math.PI;
+    this.holder.add(tiles.group);
+    this.holder.visible = false;
+    scene.add(this.holder);
     this.tiles = tiles;
     tiles.addEventListener('load-tile-set', () => {
       this.ready = true;
     });
+    // fine tiles near the site arrive after the root tileset; alignment keeps retrying until the street is hit
   }
 
   /** Flatten the plot (old buildings removed) once the tileset frame is known. */
@@ -85,22 +93,22 @@ export class GoogleTiles {
     this.raycaster.set(p, new THREE.Vector3(0, -1, 0));
     const hits = this.raycaster.intersectObject(this.tiles.group, true);
     if (hits.length) {
-      this.tiles.group.position.y -= hits[0].point.y;
-      this.tiles.group.updateMatrixWorld(true);
+      this.holder.position.y -= hits[0].point.y;
+      this.holder.updateMatrixWorld(true);
       this.aligned = true;
       this.addFlattenShapes();
     }
   }
 
   setVisible(v: boolean) {
-    this.tiles.group.visible = v;
+    this.holder.visible = v;
   }
 
   update() {
-    if (!this.tiles.group.visible) return;
+    if (!this.holder.visible) return;
     this.camera.updateMatrixWorld();
     this.tiles.update();
-    if (this.ready && !this.aligned) this.tryAlign();
+    if (this.ready && !this.aligned && this.frame++ % 30 === 0) this.tryAlign();
     const attr = this.tiles.getAttributions?.() ?? [];
     this.attribution = attr.map((a: any) => (typeof a.value === 'string' ? a.value : '')).filter(Boolean).join(' · ');
   }
