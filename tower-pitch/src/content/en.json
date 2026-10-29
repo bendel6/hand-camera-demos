@@ -1,0 +1,113 @@
+{
+  "projectName": "KAZBEGI 23",
+  "tagline": "Mixed-use towers · Kazbegi Avenue, Tbilisi",
+  "loading": "Preparing the experience",
+  "enter": "Enter",
+  "skip": "Skip intro",
+  "conceptNote": "Concept visualisation. Not an engineering or permit drawing.",
+  "nav": {
+    "overview": "Overview",
+    "location": "Location",
+    "structure": "Structure",
+    "parking": "Parking",
+    "buildup": "Build-up",
+    "greenery": "Greenery",
+    "gallery": "Gallery",
+    "lighting": "Lighting",
+    "compare": "Before / After"
+  },
+  "structure": { "explode": "Explode", "assemble": "Assemble", "xray": "X-ray", "solid": "Solid" },
+  "lighting": { "day": "Day", "golden": "Golden hour", "night": "Night", "time": "Time of day" },
+  "numbers": {
+    "height": "Height",
+    "floors": "Floors",
+    "area": "Gross area",
+    "parking": "Parking",
+    "green": "Green area",
+    "plot": "Plot"
+  },
+  "units": { "m": "m", "m2": "m²", "spaces": "spaces", "km": "km", "min": "min" },
+  "hotspots": {
+    "entrance": {
+      "title": "Main Entrance",
+      "text": "A double-height glass lobby between two terracotta portals opens straight onto Kazbegi Avenue. Shops, cafés and services line the two-storey podium and keep the street frontage active all day."
+    },
+    "parking": {
+      "title": "Parking Access",
+      "text": "Cars use a private drive loop on the west and north of the plot and then a two-way ramp under the podium, down to 350 spaces on three underground levels. Pedestrians keep the avenue frontage to themselves."
+    },
+    "green": {
+      "title": "Green Zone",
+      "text": "A landscaped garden in the north-east corner, with lawns, curving stone paths, a children's playground and shade trees, set away from the traffic."
+    },
+    "rooftop": {
+      "title": "Podium Roof Terrace",
+      "text": "The podium roof becomes a terrace for cafés and residents, with planters, shade umbrellas and open views between the two towers."
+    },
+    "facade": {
+      "title": "Facade Detail",
+      "text": "Each tower pairs deep vertical aluminium fins with a framed band of balconies: continuous slabs, glass balustrades and floor-to-ceiling energy-efficient glazing. The fins step up to a sculpted, sloping crown."
+    }
+  },
+  "layers": {
+    "facade": { "title": "Facade panels", "text": "Aluminium / composite cladding, vertical fins, balcony slabs and the sculpted crown frame." },
+    "glazing": { "title": "Glazing", "text": "Floor-to-ceiling energy-efficient glazing, glass balustrades and the podium's curtain wall." },
+    "roof": { "title": "Roof & crown", "text": "Roof membrane, rooftop plant and the podium roof terrace." },
+    "slabs": { "title": "Floor slabs", "text": "Monolithic reinforced-concrete slabs: 30 + 16 residential floors over a 2-storey podium." },
+    "columns": { "title": "Columns", "text": "A reinforced-concrete frame designed for seismic resilience and flexible planning." },
+    "cores": { "title": "Cores, lifts & stairs", "text": "Concrete cores carry the lifts and escape stairs and stiffen the towers against wind and earthquakes." },
+    "foundation": { "title": "Foundation", "text": "A raft foundation under the whole three-level basement (raft or piles, subject to the geotechnical survey)." }
+  },
+  "parking": {
+    "title": "350 parking spaces",
+    "text": "Three underground levels with separate commercial and residential zones, plus accessible bays and EV charging on every level.",
+    "levels": { "B1": "Commercial · visitors", "B2": "Residential", "B3": "Residential" },
+    "bays": "bays",
+    "ev": "EV charging",
+    "accessible": "accessible",
+    "enter": "Fly inside"
+  },
+  "buildup": {
+    "phases": [
+      "Excavation and 3-level basement",
+      "Podium: shops, lobbies and terrace",
+      "Tower B rises: 16 residential floors",
+      "Tower A tops out: 30 residential floors",
+      "Completed"
+    ]
+  },
+  "location": {
+    "title": "Location & access",
+    "summary": "{centre} min to the city centre · {airport} min to the airport · nearest metro {metro} m",
+    "filters": "Show",
+    "tour": "Auto tour",
+    "stopTour": "Stop tour",
+    "walk": "walk",
+    "drive": "drive",
+    "straight": "straight line",
+    "estimates": "Network distances from open map data. Travel times are estimates.",
+    "rings": { "walk6": "≈6 min walk", "walk12": "≈12 min walk", "drive7": "≈7 min drive", "drive12": "≈12 min drive" },
+    "categories": {
+      "Transport": "Transport",
+      "Shopping": "Shopping",
+      "Education": "Education",
+      "Health": "Health",
+      "Leisure": "Leisure",
+      "Business": "Business",
+      "Landmark": "Landmarks"
+    }
+  },
+  "gallery": { "title": "Gallery", "renders": "Architect renders", "stills": "Rendered stills" },
+  "compare": { "before": "Today", "after": "Kazbegi 23", "hint": "Drag the handle to compare" },
+  "ui": {
+    "present": "Present",
+    "record": "Record tour",
+    "recording": "Recording…",
+    "music": "Music",
+    "close": "Close",
+    "help": "Drag to orbit · right-drag to pan · scroll to zoom · double-click to fly there",
+    "presentHint": "← → hotspots · Esc to exit",
+    "contact": "Contact",
+    "attribution": "Map data © OpenStreetMap contributors, Overture Maps Foundation"
+  }
+}
