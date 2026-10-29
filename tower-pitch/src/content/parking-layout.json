@@ -1,0 +1,2496 @@
+{
+ "meta": {
+  "total": 350,
+  "levels": [
+   {
+    "name": "B1",
+    "z": -3.6,
+    "bays": 117,
+    "zone": "Commercial / visitors",
+    "colour": "#e0a458",
+    "accessible": 4,
+    "ev": 8,
+    "cars": 70
+   },
+   {
+    "name": "B2",
+    "z": -7.2,
+    "bays": 117,
+    "zone": "Residential",
+    "colour": "#4fb3a9",
+    "accessible": 4,
+    "ev": 8,
+    "cars": 75
+   },
+   {
+    "name": "B3",
+    "z": -10.8,
+    "bays": 116,
+    "zone": "Residential",
+    "colour": "#5b8def",
+    "accessible": 4,
+    "ev": 8,
+    "cars": 68
+   }
+  ],
+  "note": "ASSUMED layout; 350 bays per client brief"
+ },
+ "bays": {
+  "B1": [
+   {
+    "x": 11.05,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 13.55,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 16.05,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 19.15,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 21.65,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 24.15,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 27.25,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 29.75,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 32.25,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 35.35,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "ev",
+    "car": true
+   },
+   {
+    "x": 37.85,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 54.05,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 56.55,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "ev",
+    "car": true
+   },
+   {
+    "x": 59.65,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 62.15,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 64.65,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 67.75,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 70.25,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 11.05,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 13.55,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 16.05,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 19.15,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 21.65,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 24.15,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 27.25,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 29.75,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 32.25,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 35.35,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 37.85,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "accessible",
+    "car": false
+   },
+   {
+    "x": 54.05,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "accessible",
+    "car": false
+   },
+   {
+    "x": 56.55,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "ev",
+    "car": true
+   },
+   {
+    "x": 59.65,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 62.15,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 64.65,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 67.75,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 70.25,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 11.05,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 13.55,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 16.05,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 19.15,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 21.65,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 24.15,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 27.25,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 29.75,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 32.25,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 35.35,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 37.85,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 40.35,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 51.55,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "ev",
+    "car": true
+   },
+   {
+    "x": 54.05,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 56.55,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 59.65,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 62.15,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 64.65,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 67.75,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 70.25,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 11.05,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 13.55,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "ev",
+    "car": false
+   },
+   {
+    "x": 16.05,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 32.25,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 35.35,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 37.85,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 40.35,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 51.55,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 54.05,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 56.55,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 59.65,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 62.15,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 64.65,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 67.75,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 70.25,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 11.05,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "ev",
+    "car": false
+   },
+   {
+    "x": 13.55,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 16.05,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "accessible",
+    "car": false
+   },
+   {
+    "x": 32.25,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "accessible",
+    "car": false
+   },
+   {
+    "x": 35.35,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "ev",
+    "car": false
+   },
+   {
+    "x": 37.85,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 40.35,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 51.55,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 54.05,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 56.55,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 59.65,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 11.05,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 13.55,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 16.05,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 32.25,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "ev",
+    "car": false
+   },
+   {
+    "x": 35.35,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 37.85,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 40.35,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 43.45,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 45.95,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 48.45,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 51.55,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 54.05,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 56.55,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 59.65,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 62.15,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 64.65,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 67.75,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 70.25,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 11.05,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 13.55,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 16.05,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 19.15,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 21.65,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 24.15,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 27.25,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 29.75,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 32.25,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 35.35,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 37.85,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 40.35,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 43.45,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 45.95,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 48.45,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 51.55,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 54.05,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   }
+  ],
+  "B2": [
+   {
+    "x": 11.05,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 13.55,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 16.05,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 19.15,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 21.65,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 24.15,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 27.25,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 29.75,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 32.25,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 35.35,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "ev",
+    "car": false
+   },
+   {
+    "x": 37.85,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 54.05,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 56.55,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "ev",
+    "car": false
+   },
+   {
+    "x": 59.65,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 62.15,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 64.65,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 67.75,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 70.25,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 11.05,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 13.55,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 16.05,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 19.15,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 21.65,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 24.15,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 27.25,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 29.75,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 32.25,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 35.35,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 37.85,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "accessible",
+    "car": false
+   },
+   {
+    "x": 54.05,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "accessible",
+    "car": true
+   },
+   {
+    "x": 56.55,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "ev",
+    "car": false
+   },
+   {
+    "x": 59.65,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 62.15,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 64.65,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 67.75,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 70.25,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 11.05,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 13.55,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 16.05,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 19.15,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 21.65,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 24.15,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 27.25,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 29.75,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 32.25,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 35.35,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 37.85,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 40.35,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 51.55,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "ev",
+    "car": true
+   },
+   {
+    "x": 54.05,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 56.55,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 59.65,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 62.15,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 64.65,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 67.75,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 70.25,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 11.05,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 13.55,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "ev",
+    "car": true
+   },
+   {
+    "x": 16.05,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 32.25,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 35.35,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 37.85,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 40.35,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 51.55,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 54.05,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 56.55,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 59.65,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 62.15,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 64.65,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 67.75,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 70.25,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 11.05,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "ev",
+    "car": true
+   },
+   {
+    "x": 13.55,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 16.05,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "accessible",
+    "car": false
+   },
+   {
+    "x": 32.25,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "accessible",
+    "car": false
+   },
+   {
+    "x": 35.35,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "ev",
+    "car": true
+   },
+   {
+    "x": 37.85,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 40.35,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 51.55,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 54.05,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 56.55,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 59.65,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 11.05,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 13.55,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 16.05,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 32.25,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "ev",
+    "car": true
+   },
+   {
+    "x": 35.35,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 37.85,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 40.35,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 43.45,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 45.95,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 48.45,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 51.55,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 54.05,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 56.55,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 59.65,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 62.15,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 64.65,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 67.75,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 70.25,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 11.05,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 13.55,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 16.05,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 19.15,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 21.65,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 24.15,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 27.25,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 29.75,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 32.25,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 35.35,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 37.85,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 40.35,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 43.45,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 45.95,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 48.45,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 51.55,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 54.05,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   }
+  ],
+  "B3": [
+   {
+    "x": 11.05,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 13.55,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 16.05,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 19.15,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 21.65,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 24.15,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 27.25,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 29.75,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 32.25,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 35.35,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "ev",
+    "car": true
+   },
+   {
+    "x": 37.85,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 54.05,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 56.55,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "ev",
+    "car": true
+   },
+   {
+    "x": 59.65,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 62.15,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 64.65,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 67.75,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 70.25,
+    "y": 6.5,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 11.05,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 13.55,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 16.05,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 19.15,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 21.65,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 24.15,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 27.25,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 29.75,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 32.25,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 35.35,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 37.85,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "accessible",
+    "car": false
+   },
+   {
+    "x": 54.05,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "accessible",
+    "car": true
+   },
+   {
+    "x": 56.55,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "ev",
+    "car": false
+   },
+   {
+    "x": 59.65,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 62.15,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 64.65,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 67.75,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 70.25,
+    "y": 17.7,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 11.05,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 13.55,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 16.05,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 19.15,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 21.65,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 24.15,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 27.25,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 29.75,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 32.25,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 35.35,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 37.85,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 40.35,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 51.55,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "ev",
+    "car": true
+   },
+   {
+    "x": 54.05,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 56.55,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 59.65,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 62.15,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 64.65,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 67.75,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 70.25,
+    "y": 22.7,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 11.05,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 13.55,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "ev",
+    "car": true
+   },
+   {
+    "x": 16.05,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 32.25,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 35.35,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 37.85,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 40.35,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 51.55,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 54.05,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 56.55,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 59.65,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 62.15,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 64.65,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 67.75,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 70.25,
+    "y": 33.9,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 11.05,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "ev",
+    "car": true
+   },
+   {
+    "x": 13.55,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 16.05,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "accessible",
+    "car": false
+   },
+   {
+    "x": 32.25,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "accessible",
+    "car": false
+   },
+   {
+    "x": 35.35,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "ev",
+    "car": true
+   },
+   {
+    "x": 37.85,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 40.35,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 51.55,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 54.05,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 56.55,
+    "y": 38.9,
+    "facing": 1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 11.05,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 13.55,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 16.05,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 32.25,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "ev",
+    "car": false
+   },
+   {
+    "x": 35.35,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 37.85,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 40.35,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 43.45,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 45.95,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 48.45,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 51.55,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 54.05,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 56.55,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 59.65,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 62.15,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 64.65,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 67.75,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 70.25,
+    "y": 50.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 11.05,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 13.55,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 16.05,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 19.15,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 21.65,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 24.15,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 27.25,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 29.75,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 32.25,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 35.35,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 37.85,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 40.35,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 43.45,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   },
+   {
+    "x": 45.95,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 48.45,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 51.55,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": true
+   },
+   {
+    "x": 54.05,
+    "y": 61.1,
+    "facing": -1,
+    "kind": "standard",
+    "car": false
+   }
+  ]
+ }
+}
