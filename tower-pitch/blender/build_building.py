@@ -73,6 +73,8 @@ def materials():
     M["wood"] = mat("M_Wood", "#8a6243", rough=0.6)
     M["umbrella"] = mat("M_Umbrella", "#ece7dc", rough=0.8)
     M["lift"] = mat("M_LiftCab", "#d6b46a", metal=0.9, rough=0.25)
+    M["soffit"] = mat("M_SoffitLight", "#cfcac2", rough=0.3, emit="#ffd9a8", emit_strength=0.0)
+    M["led"] = mat("M_LED", "#4d5157", rough=0.3, emit="#e9f1ff", emit_strength=0.0)
     return M
 
 
@@ -147,6 +149,16 @@ def balcony_zone(F, G, M, p0, d, n, u0, u1, z0, floors, crown, post0=True, post1
             fprofile(F, p0, d, n, pa, pb, w_glass, w_front, z0, crown, M["frame"], steps=2)
     # crown panel (parapet) across the zone, sloped/concave top
     fprofile(F, p0, d, n, a, b, -0.25, w_front, ztop, crown, M["frame"], steps=14)
+    # LED line tracing the crown's top edge (lit at night)
+    steps = 14
+    for k in range(steps):
+        ua = a + (b - a) * k / steps
+        ub = a + (b - a) * (k + 1) / steps
+        xa, ya, _ = to_world(p0, d, n, ua, 0, 0)
+        xb, yb, _ = to_world(p0, d, n, ub, 0, 0)
+        za, zb = crown(xa, ya) - 0.25, crown(xb, yb) - 0.25
+        F.poly([to_world(p0, d, n, ua, w_front + 0.012, za - 0.1), to_world(p0, d, n, ub, w_front + 0.012, zb - 0.1),
+                to_world(p0, d, n, ub, w_front + 0.012, zb), to_world(p0, d, n, ua, w_front + 0.012, za)], M["led"])
     # glazing line + mullions + floor spandrels
     fquad(G, p0, d, n, a, b, w_glass, z0, ztop, M["glass_res"])
     nm = max(2, int((b - a) / 1.5))
@@ -163,6 +175,13 @@ def balcony_zone(F, G, M, p0, d, n, u0, u1, z0, floors, crown, post0=True, post1
         fbox(F, p0, d, n, a, b, w_glass + 0.01, w_glass + 0.08, z - 0.3, z + 0.12, M["spandrel"], skip=("-z", "+z"))
         if i == floors:
             break
+        # downlights in the soffit of the balcony above (one per apartment bay)
+        zs = z + FH - 0.285
+        for k in range(ndiv):
+            uc = a + span * (k + 0.5) / ndiv
+            q = [to_world(p0, d, n, uc - 0.16, -0.78, zs), to_world(p0, d, n, uc + 0.16, -0.78, zs),
+                 to_world(p0, d, n, uc + 0.16, -0.46, zs), to_world(p0, d, n, uc - 0.16, -0.46, zs)]
+            F.poly(q, M["soffit"])  # faces down
         # glass balustrade + top rail
         fquad(G, p0, d, n, a, b, -0.02, z, z + 1.08, M["rail_glass"])
         fbox(F, p0, d, n, a, b, -0.06, 0.0, z + 1.06, z + 1.12, M["rail"])
@@ -199,6 +218,9 @@ def fin_zone(F, G, M, p0, d, n, u0, u1, z0, floors, crown, corner0=True, corner1
         x, y, _ = to_world(p0, d, n, (fa + fb) / 2, 0, 0)
         top = crown(x, y) + 1.6
         fbox(F, p0, d, n, fa, fb, w_glass, 0.75, z0, top, M["fin"])
+        uc = (fa + fb) / 2
+        F.poly([to_world(p0, d, n, uc - 0.05, 0.762, top - 8.0), to_world(p0, d, n, uc + 0.05, 0.762, top - 8.0),
+                to_world(p0, d, n, uc + 0.05, 0.762, top - 0.2), to_world(p0, d, n, uc - 0.05, 0.762, top - 0.2)], M["led"])
     fquad(G, p0, d, n, u0, u1, w_glass, z0, ztop, M["glass_res"])
     for k in range(nb):
         a, b = fins[k][1], fins[k + 1][0]

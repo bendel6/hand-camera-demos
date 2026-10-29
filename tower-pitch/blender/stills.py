@@ -251,9 +251,10 @@ def tune_materials(tod):
             b.inputs["Base Color"].default_value = (*lib.hex_rgb(col), 1)
             b.inputs["Metallic"].default_value = metal
             b.inputs["Roughness"].default_value = rough
-    lamp = bpy.data.materials.get("M_LampHead")
-    if lamp:
-        lamp.node_tree.nodes["Principled BSDF"].inputs["Emission Strength"].default_value = 30.0 if night else 0.0
+    for nm, strength in (("M_LampHead", 30.0), ("M_SoffitLight", 18.0), ("M_LED", 14.0)):
+        lm = bpy.data.materials.get(nm)
+        if lm:
+            lm.node_tree.nodes["Principled BSDF"].inputs["Emission Strength"].default_value = strength if night else 0.0
 
 
 def add_interiors(tod):

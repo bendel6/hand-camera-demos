@@ -8,6 +8,7 @@ import { Life } from './life';
 import { Effects, LAYERS } from './effects';
 import { Location, POIS, Category } from './location';
 import { GoogleTiles } from './tiles';
+import { CityReflections } from './reflections';
 import { Flight, VIEWS, View, view } from './flight';
 import { INTERIOR } from './materials';
 import { FX } from './fx';
@@ -45,6 +46,7 @@ export class App {
   effects!: Effects;
   location: Location;
   tiles: GoogleTiles | null = null;
+  reflections!: CityReflections;
   flight: Flight;
   ui!: UI;
   mode: Mode = 'overview';
@@ -110,6 +112,8 @@ export class App {
     onProgress('location', 0.92);
     await this.location.init();
     this.collectNightMaterials();
+    this.reflections = new CityReflections(this.renderer, this.scene, this.env, this.models.building);
+    this.env.listeners.push(() => this.reflections.request());
     const key = import.meta.env.VITE_GOOGLE_KEY as string | undefined;
     if (key) {
       this.tiles = new GoogleTiles(this.scene, this.camera, this.renderer, key);
@@ -117,6 +121,7 @@ export class App {
     } else {
       // open-data city model (Overture + terrain), loaded in the background
       this.models.loadContext().then(async () => {
+        this.reflections.request(200);
         const res = await fetch(`${BASE}data/trees-near.json`).catch(() => null);
         if (res && res.ok) {
           const d = await res.json();
@@ -126,6 +131,8 @@ export class App {
     }
     this.env.setTime(this.env.presetMinutes('golden'));
     this.onLighting();
+    this.env.forceEnv();
+    this.reflections.capture();
     // compile shaders up front so the first frames do not stutter
     this.renderer.compile(this.scene, this.camera);
     onProgress('ready', 1);
@@ -150,10 +157,10 @@ export class App {
     INTERIOR.uNight.value = n;
     INTERIOR.uDay.value = THREE.MathUtils.lerp(1.0, 0.25, n) * (1 - this.env.golden * 0.35);
     for (const m of this.nightMats) {
-      const base: Record<string, number> = { M_HeadLight: 9, M_TailLight: 5, M_LampHead: 14 };
+      const base: Record<string, number> = { M_HeadLight: 9, M_TailLight: 5, M_LampHead: 14, M_SoffitLight: 7, M_LED: 9 };
       const name = m.name;
       if (name in base) {
-        m.emissive.set(name === 'M_TailLight' ? 0xff2a1a : name === 'M_LampHead' ? 0xffd9a0 : 0xfff3d6);
+        m.emissive.set(name === 'M_TailLight' ? 0xff2a1a : name === 'M_LampHead' || name === 'M_SoffitLight' ? 0xffd2a0 : name === 'M_LED' ? 0xe6efff : 0xfff3d6);
         m.emissiveIntensity = base[name] * THREE.MathUtils.smoothstep(n, 0.15, 0.6);
       }
     }
@@ -427,7 +434,10 @@ export class App {
 
   /** Render one frame synchronously (headless screenshots). */
   frameOnce() {
-    this.env.forceEnv();
+    if (this.env.envDirtyFlag) {
+      this.env.forceEnv();
+      this.reflections.capture();
+    }
     this.frame();
   }
 

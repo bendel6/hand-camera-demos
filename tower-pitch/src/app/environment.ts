@@ -58,7 +58,7 @@ void main() {
   vec3 lit = uSunCol * (1.0 + 1.4 * pow(sunAmt, 6.0));
   vec3 shade = mix(uSkyCol, vec3(0.78, 0.8, 0.84), 0.55) * 0.82;
   vec3 col = mix(lit, shade, thick * 0.55) * uBright;
-  col = mix(col, vec3(0.03, 0.035, 0.05) + vec3(0.08, 0.045, 0.025), uNight);
+  col = mix(col, vec3(0.018, 0.024, 0.042) + vec3(0.045, 0.028, 0.018), uNight);
   float horizon = smoothstep(0.0, 0.18, d.y);
   gl_FragColor = vec4(col, c * horizon * 0.92);
   #include <tonemapping_fragment>
@@ -309,6 +309,10 @@ export class Environment {
     this.sun.position.x = Math.round(this.sun.position.x / texel) * texel;
     this.sun.position.z = Math.round(this.sun.position.z / texel) * texel;
     this.sun.target.updateMatrixWorld();
+  }
+
+  get envDirtyFlag() {
+    return this.envDirty;
   }
 
   /** Regenerate the environment map now (used by headless renders). */

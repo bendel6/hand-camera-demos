@@ -362,17 +362,87 @@ export class Effects {
   }
 
   // ------------------------------------------------------------------ build-up
+  cranes: THREE.Group[] = [];
+
+  /** Two luffing-free tower cranes (mast, jib, counter-jib, cab) that climb with the construction height. */
+  private makeCranes() {
+    const yellow = new THREE.MeshStandardMaterial({ color: 0xe0a21b, roughness: 0.55, metalness: 0.3 });
+    const dark = new THREE.MeshStandardMaterial({ color: 0x2a2c2f, roughness: 0.6, metalness: 0.4 });
+    const steel = new THREE.LineBasicMaterial({ color: 0xc58d14 });
+    const spots: Array<[number, number, number]> = [[8.0, 30.0, 0.6], [38.5, 25.5, 2.4]];
+    for (const [x, y, yaw] of spots) {
+      const g = new THREE.Group();
+      g.position.copy(siteToWorld(x, y, 0));
+      // mast: 4 chords + zig-zag bracing, built 1 m tall and scaled in y
+      const mast = new THREE.Group();
+      const chord = new THREE.BoxGeometry(0.22, 1, 0.22);
+      chord.translate(0, 0.5, 0);
+      for (const [dx, dz] of [[-0.9, -0.9], [0.9, -0.9], [0.9, 0.9], [-0.9, 0.9]]) {
+        const c = new THREE.Mesh(chord, yellow);
+        c.position.set(dx, 0, dz);
+        mast.add(c);
+      }
+      const brace: number[] = [];
+      for (let k = 0; k < 140; k++) {
+        const y0 = k, y1 = k + 1;
+        brace.push(-0.9, y0, -0.9, 0.9, y1, -0.9, 0.9, y0, 0.9, -0.9, y1, 0.9, -0.9, y0, 0.9, -0.9, y1, -0.9, 0.9, y0, -0.9, 0.9, y1, 0.9);
+      }
+      const bg = new THREE.BufferGeometry();
+      bg.setAttribute('position', new THREE.Float32BufferAttribute(brace, 3));
+      const braces = new THREE.LineSegments(bg, steel);
+      g.add(mast, braces);
+      const head = new THREE.Group();
+      const jib = new THREE.Mesh(new THREE.BoxGeometry(52, 1.4, 1.4), yellow);
+      jib.position.set(26, 1.2, 0);
+      const cjib = new THREE.Mesh(new THREE.BoxGeometry(16, 1.2, 1.6), yellow);
+      cjib.position.set(-8, 1.2, 0);
+      const weight = new THREE.Mesh(new THREE.BoxGeometry(3.5, 2.6, 2.4), dark);
+      weight.position.set(-14, 0.2, 0);
+      const cab = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2.2, 2.2), dark);
+      cab.position.set(1.8, -0.6, 1.8);
+      const apex = new THREE.Mesh(new THREE.ConeGeometry(0.9, 7, 4), yellow);
+      apex.position.set(0, 5.2, 0);
+      const hook = new THREE.Mesh(new THREE.BoxGeometry(0.06, 22, 0.06), dark);
+      hook.position.set(34, -10, 0);
+      head.add(jib, cjib, weight, cab, apex, hook);
+      head.rotation.y = yaw;
+      g.add(head);
+      g.userData = { mast, braces, head };
+      g.visible = false;
+      g.traverse((o) => ((o as THREE.Mesh).castShadow = true));
+      this.scene.add(g);
+      this.cranes.push(g);
+    }
+  }
+
+  private updateCranes(h: number, t: number) {
+    for (const [i, g] of this.cranes.entries()) {
+      const top = Math.max(18, Math.min(h + 14, i === 0 ? 128 : 80));
+      const { mast, braces, head } = g.userData as any;
+      mast.scale.y = top;
+      braces.geometry.setDrawRange(0, Math.floor(top) * 8);
+      head.position.y = top;
+      head.rotation.y += 0.0035 * (i ? -1 : 1);
+      void t;
+    }
+  }
+
   buildUp(onPhase: (i: number) => void): Promise<void> {
+    if (!this.cranes.length) this.makeCranes();
+    for (const c of this.cranes) c.visible = true;
     FX.uBuildOn.value = 1;
     FX.uBuildH.value = -13;
     const tl = gsap.timeline();
     const phases = [-13, 0, 9.6, 62.4, 108.6, 125];
     for (let i = 0; i < phases.length - 1; i++) {
-      tl.to(FX.uBuildH, { value: phases[i + 1], duration: [1.4, 1.4, 3.2, 3.0, 0.8][i], ease: 'none', onStart: () => onPhase(i) });
+      tl.to(FX.uBuildH, { value: phases[i + 1], duration: [1.4, 1.4, 3.2, 3.0, 0.8][i], ease: 'none', onStart: () => onPhase(i), onUpdate: () => this.updateCranes(FX.uBuildH.value, 0) });
     }
     return new Promise((res) =>
       tl.eventCallback('onComplete', () => {
         FX.uBuildOn.value = 0;
+        gsap.delayedCall(1.5, () => {
+          for (const c of this.cranes) c.visible = false;
+        });
         res();
       }),
     );

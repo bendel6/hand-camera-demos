@@ -99,7 +99,7 @@ function interiorGlass(base: THREE.MeshStandardMaterial, room: [number, number, 
     roughness: 0.035,
     ior: 1.52,
     specularIntensity: 1,
-    envMapIntensity: 1.6,
+    envMapIntensity: 1.05,
     clearcoat: 0.0,
   });
   const local = {
@@ -196,7 +196,7 @@ export function upgradeMaterials(root: THREE.Object3D, kind: 'building' | 'site'
         if (m.map) m.map.anisotropy = 16;
         if (m.normalMap) m.normalMap.anisotropy = 16;
       }
-      if (/^M_(HeadLight|TailLight|LampHead|Level|ParkingLight|ChargerLED)/.test(m.name)) {
+      if (/^M_(HeadLight|TailLight|LampHead|Level|ParkingLight|ChargerLED|SoffitLight|LED)/.test(m.name)) {
         (nm as any).userData.nightEmissive = true;
       }
       applyFx(nm, role, { cut: kind !== 'context' });
