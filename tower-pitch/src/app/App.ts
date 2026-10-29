@@ -101,6 +101,7 @@ export class App {
     window.addEventListener('resize', () => this.resize());
     canvas.addEventListener('dblclick', (e) => this.onDoubleClick(e));
     window.addEventListener('keydown', (e) => this.onKey(e));
+    for (const ev of ['pointerdown', 'wheel', 'keydown']) window.addEventListener(ev, () => (this.lastInput = performance.now()), { passive: true });
     this.env.listeners.push(() => this.onLighting());
   }
 
@@ -291,6 +292,7 @@ export class App {
   }
   compareActive = false;
   mapLook = 1;
+  lastInput = performance.now();
 
   async explode(on: boolean) {
     if (this.mode !== 'structure') await this.setMode('structure');
@@ -475,6 +477,14 @@ export class App {
     else this.post.render(dt);
 
     const now = performance.now();
+    // present mode on a meeting-room TV: step through the hotspots by itself when nobody touches it
+    if (this.present && !this.flight.busy && now - this.lastInput > 14000) {
+      this.lastInput = now;
+      this.presentIndex = (this.presentIndex + 1) % HOTSPOTS.length;
+      const h = HOTSPOTS[this.presentIndex];
+      this.focusHotspot(h.id);
+      this.ui.openHotspot(h.id, false);
+    }
     if (this.ui?.app && this.effects && now - this.lastLabelAt > 30) {
       this.lastLabelAt = now;
       this.updateLabels();

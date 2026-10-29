@@ -155,13 +155,14 @@ def parking_floor(n=1024, seed=17):
 
 
 if __name__ == "__main__":
-    pavers()
-    pavers(cell=(8, 8), grout=0.02, c0="#7d7a74", c1="#a19d95", seed=2, name="sidewalk")
+    N = 2048  # desktop target: 2K ground textures stay crisp at street level
+    pavers(n=N)
+    pavers(n=N, cell=(8, 8), grout=0.02, c0="#7d7a74", c1="#a19d95", seed=2, name="sidewalk")
     flagstones()
-    asphalt()
-    grass()
+    asphalt(n=N)
+    grass(n=N)
     rubber()
-    concrete()
+    concrete(n=N)
     ribs()
     parking_floor()
     print(sorted(os.listdir(OUT)))

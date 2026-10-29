@@ -18,7 +18,15 @@ async function boot() {
   // rendered stills (Cycles) for the gallery, if present
   fetch(`${BASE}assets/stills/index.json`)
     .then((r) => (r.ok ? r.json() : []))
-    .then((list) => ((window as any).__STILLS__ = list))
+    .then((list: string[]) => {
+      (window as any).__STILLS__ = list;
+      const loaderEl = document.querySelector('.loader') as HTMLElement | null;
+      if (loaderEl && list.length) {
+        loaderEl.style.backgroundImage = `linear-gradient(rgba(8,10,12,0.72), rgba(8,10,12,0.86)), url(${list[0]})`;
+        loaderEl.style.backgroundSize = 'cover';
+        loaderEl.style.backgroundPosition = 'center';
+      }
+    })
     .catch(() => {});
 
   let entered = false;
