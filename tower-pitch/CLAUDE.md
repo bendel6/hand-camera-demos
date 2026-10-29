@@ -143,3 +143,14 @@
 - Google keys are read from env: GOOGLE_MAPS_BROWSER_KEY (Map Tiles only, referrer-restricted, shipped to the browser)
   and GOOGLE_MAPS_SERVER_KEY (Places/Routes/Geocoding, used only by scripts/fetch-poi.mjs, never shipped).
 - Vercel deploys go through the Vercel connector (team "bendel's projects").
+
+## Status and next steps (cinematic real-city renders)
+The user wants Blender-quality renders/reels with the ACTUAL city (photoreal), and the towers 1:1 with the architect's
+renders. Done: render-matched facades and crowns (camera solved from render p05, see notes/compare_p05_*.jpg),
+tower B widened to 42 m per renders, `blender/stills.py` (stills, presets incl. `match_p05_dusk`) and
+`blender/reels.py` (drone reels, vertical 1080x1920, resumable, ffmpeg encode).
+Real city needs the Google Map Tiles key (env secret GOOGLE_MAPS_BROWSER_KEY). With it:
+  1. `node scripts/google_tiles.mjs --radius 900 --far 2600` -> blender/out/gtiles (Draco decoded, ECEF->site ENU)
+  2. `blender/stills.py <preset>` and `blender/reels.py <reel>` pick the tiles up automatically (levelled to the street,
+     plot + modelled avenue flattened, "Google" attribution burned into videos).
+CPU-only container: reels take ~1-2 min/frame at 1080x1920; offer the .blend (`--blend`) for the user's RTX PC.

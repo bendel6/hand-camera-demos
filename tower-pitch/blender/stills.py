@@ -31,6 +31,10 @@ PRESETS = {
     "night_aerial": dict(cam=(260, -300, 170), tgt=(40, 32, 45), lens=50, shift=0.0, tod="night", sun=(250, -15), exp=1.2),
     "blue_hour": dict(cam=(135, -46, 9), tgt=(38, 30, 52), lens=24, shift=0.18, tod="blue", sun=(255, -3), exp=1.0),
     "garden": dict(cam=(79, 63, 1.7), tgt=(46, 28, 18), lens=17, shift=0.25, tod="day", sun=(215, 38), exp=-0.1),
+    # camera solved from the architect's render p05 (corners fit to 13 px; implied peak 114.7 m)
+    "match_p05": dict(cam=(-141.8, -398.3, 1.7), tgt=(-65.9, -213.3, 1.7), lens=123.3, shift=0.39, tod="blue", sun=(255, -2), exp=0.9),
+    "match_p05_golden": dict(cam=(-141.8, -398.3, 1.7), tgt=(-65.9, -213.3, 1.7), lens=123.3, shift=0.39, tod="golden", sun=(250, 6), exp=0.3),
+    "match_p05_dusk": dict(cam=(-141.8, -398.3, 1.7), tgt=(-65.9, -213.3, 1.7), lens=123.3, shift=0.39, tod="dusk", sun=(255, -1), exp=0.55),
     "top": dict(cam=(40, 0, 600), tgt=(40, 0.01, 0), lens=30, shift=0.0, tod="day", sun=(200, 45), exp=-0.2),
 }
 
@@ -225,7 +229,7 @@ def context_material(night):
 
 
 def tune_materials(tod):
-    night = tod in ("night", "blue")
+    night = tod in ("night", "blue", "dusk")
     glass = archviz_glass("STILL_glass", reflect=1.0)
     rail = archviz_glass("STILL_rail", tint=(0.9, 0.95, 0.95), reflect=0.8)
     shop = archviz_glass("STILL_shopglass", tint=(0.9, 0.92, 0.9), reflect=0.9)
@@ -243,8 +247,8 @@ def tune_materials(tod):
             elif m.name == "M_Glass_Shop":
                 slot.material = shop
     # cladding: slightly brighter, anodised look
-    for nm, col, metal, rough in (("M_Cladding", "#7a8089", 0.35, 0.38), ("M_Frame", "#5d636b", 0.4, 0.34),
-                                  ("M_Fin", "#868c94", 0.45, 0.3), ("M_PodiumRed", "#7a2f2b", 0.15, 0.45)):
+    for nm, col, metal, rough in (("M_Cladding", "#7a8089", 0.35, 0.38), ("M_Frame", "#6a717b", 0.45, 0.34),
+                                  ("M_Fin", "#7d858f", 0.55, 0.3), ("M_PodiumRed", "#7a2f2b", 0.15, 0.45)):
         m = bpy.data.materials.get(nm)
         if m:
             b = m.node_tree.nodes.get("Principled BSDF")
@@ -260,10 +264,10 @@ def tune_materials(tod):
 def add_interiors(tod):
     """Room liners 5.5 m behind the glass on every residential floor, plus warm shop interiors in the podium."""
     from shapely.geometry import Polygon
-    lit = {"day": 0.08, "golden": 0.22, "blue": 0.55, "night": 0.62}[tod]
-    strength = {"day": 0.0, "golden": 3.0, "blue": 6.0, "night": 7.0}[tod]
+    lit = {"day": 0.08, "golden": 0.22, "dusk": 0.34, "blue": 0.55, "night": 0.62}[tod]
+    strength = {"day": 0.0, "golden": 3.0, "dusk": 4.0, "blue": 6.0, "night": 7.0}[tod]
     mat = interior_material("STILL_interior", lit, strength)
-    smat = interior_material("STILL_shops", 0.9, {"day": 0.35, "golden": 0.9, "blue": 4.5, "night": 5.5}[tod], shop=True)
+    smat = interior_material("STILL_shops", 0.9, {"day": 0.35, "golden": 0.9, "dusk": 2.6, "blue": 4.5, "night": 5.5}[tod], shop=True)
     root = site_root()
     acc = lib.MeshAccum("Interiors")
     for poly, floors in ((TOWER_A, 30), (TOWER_B, 16)):
@@ -499,10 +503,18 @@ def setup_world(tod, sun_az, sun_el):
     sky.sun_rotation = math.radians(90 - sun_az)  # blender: 0 = +X (east), CCW; azimuth: clockwise from north
     sky.altitude = 470
     sky.air_density = 1.2
-    sky.aerosol_density = 1.6 if tod != "day" else 1.0
+    sky.aerosol_density = {"day": 1.0, "dusk": 3.5}.get(tod, 1.6)
     bg = nt.nodes["Background"]
-    bg.inputs["Strength"].default_value = {"day": 0.22, "golden": 0.26, "blue": 0.9, "night": 0.06}[tod]
+    bg.inputs["Strength"].default_value = {"day": 0.22, "golden": 0.26, "dusk": 1.8, "blue": 0.9, "night": 0.06}[tod]
     nt.links.new(sky.outputs["Color"], bg.inputs["Color"])
+    if tod == "dusk":
+        # overcast twilight: desaturated, cool, evenly bright sky (architect's render p05)
+        mix = nt.nodes.new("ShaderNodeMix")
+        mix.data_type = "RGBA"
+        mix.inputs["Factor"].default_value = 0.65
+        mix.inputs["B"].default_value = (0.42, 0.47, 0.56, 1)
+        nt.links.new(sky.outputs["Color"], mix.inputs["A"])
+        nt.links.new(mix.outputs["Result"], bg.inputs["Color"])
     if tod == "night":
         mix = nt.nodes.new("ShaderNodeMix")
         mix.data_type = "RGBA"
@@ -513,8 +525,8 @@ def setup_world(tod, sun_az, sun_el):
     if sun_el > -1:
         sun = bpy.data.objects.new("Sun", bpy.data.lights.new("Sun", "SUN"))
         sc.collection.objects.link(sun)
-        sun.data.energy = {"day": 9.0, "golden": 7.5, "blue": 0.0, "night": 0.0}[tod]
-        warm = {"day": (1.0, 0.95, 0.88), "golden": (1.0, 0.56, 0.3), "blue": (1, 1, 1), "night": (1, 1, 1)}[tod]
+        sun.data.energy = {"day": 9.0, "golden": 7.5, "dusk": 0.0, "blue": 0.0, "night": 0.0}[tod]
+        warm = {"day": (1.0, 0.95, 0.88), "golden": (1.0, 0.56, 0.3), "dusk": (1, 1, 1), "blue": (1, 1, 1), "night": (1, 1, 1)}[tod]
         sun.data.color = warm
         sun.data.angle = math.radians(0.6)
         az = math.radians(sun_az)
@@ -643,8 +655,9 @@ def import_google_tiles():
     return objs
 
 
-def build_scene(tod, cam=None, use_gtiles=None):
-    """Assemble everything for a time of day. Returns True when the real (Google) city was used."""
+def build_scene(tod, cam=None, use_gtiles=None, context=True):
+    """Assemble everything for a time of day. Returns True when the real (Google) city was used.
+    context=False: no surrounding city (camera-match comparisons), just a large wet-asphalt ground."""
     night = tod in ("night", "blue")
     rnd = random.Random(11)
     bpy.ops.wm.open_mainfile(filepath=os.path.join(lib.OUT, "building.blend"))
@@ -654,7 +667,16 @@ def build_scene(tod, cam=None, use_gtiles=None):
         before.hide_render = True
     if use_gtiles is None:
         use_gtiles = os.path.exists(os.path.join(GTILES, "manifest.json"))
-    if use_gtiles:
+    if not context:
+        use_gtiles = False
+        bpy.ops.mesh.primitive_plane_add(size=4000, location=(0, 0, -0.04))
+        gm, nt, out_n = node_mat("STILL_wetground")
+        bs = nt.nodes.new("ShaderNodeBsdfPrincipled")
+        bs.inputs["Base Color"].default_value = (0.035, 0.036, 0.04, 1)
+        bs.inputs["Roughness"].default_value = 0.12
+        nt.links.new(bs.outputs[0], out_n.inputs["Surface"])
+        bpy.context.active_object.data.materials.append(gm)
+    elif use_gtiles:
         import_google_tiles()
         # the real city has its own buildings and trees across the avenue: drop the assumed green strip
         import bmesh
@@ -692,7 +714,7 @@ def build_scene(tod, cam=None, use_gtiles=None):
     tune_materials(tod)
     add_interiors(tod)
     cols = tree_collections()
-    add_trees(cols, rnd, real_city=use_gtiles)
+    add_trees(cols, rnd, real_city=use_gtiles or not context)
     add_cars(rnd, night, cam)
     add_people(rnd)
     add_street_lights(night)
@@ -709,7 +731,8 @@ def main():
     samples = int(args[args.index("--samples") + 1]) if "--samples" in args else 384
     out = args[args.index("--out") + 1] if "--out" in args else os.path.join(lib.OUT, f"still_{preset}.png")
     p = PRESETS[preset]
-    build_scene(p["tod"], p["cam"], use_gtiles=False if "--no-gtiles" in args else None)
+    build_scene(p["tod"], p["cam"], use_gtiles=False if "--no-gtiles" in args else None,
+                context="--no-context" not in args)
     setup_world(p["tod"], *p["sun"])
     setup_camera(p)
     if "--blend" in args:
