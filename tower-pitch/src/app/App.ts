@@ -185,7 +185,8 @@ export class App {
       this.post.outline.selection.clear();
     }
     if (prev === 'parking' && mode !== 'parking') {
-      await this.effects.setParking(false, this.models.props, (v) => this.ghostBuilding(v));
+      await this.effects.setParking(false, this.models.props);
+      this.buildingShadows(true);
       this.controls.maxPolarAngle = Math.PI * 0.82;
     }
     if (prev === 'compare') this.setBefore(false);
@@ -207,8 +208,9 @@ export class App {
         break;
       case 'parking':
         this.controls.maxPolarAngle = Math.PI / 2 + 0.25;
+        this.buildingShadows(false);
         await this.flight.to(VIEWS.parking, 2.6);
-        await this.effects.setParking(true, this.models.props, (v) => this.ghostBuilding(v));
+        await this.effects.setParking(true, this.models.props, (lv) => this.ui.onParkingLevel(lv));
         break;
       case 'buildup':
         await this.flight.to(VIEWS.buildup, 2.2);
@@ -224,10 +226,20 @@ export class App {
     }
   }
 
+  /** Cut-away geometry still casts shadows from the depth pass, so building shadows are off during cutaways. */
+  buildingShadows(on: boolean) {
+    this.models.building.traverse((o) => {
+      const m = o as THREE.Mesh;
+      if (m.isMesh) m.castShadow = on;
+    });
+  }
+
   async runBuildUp() {
+    this.buildingShadows(false);
     const orbit = this.flight.orbit(SITE_CENTRE.clone().setY(30), 210, 70, -2.2, 1.1, 11.5);
     await this.effects.buildUp((i) => this.ui.showPhase(i));
     await orbit;
+    this.buildingShadows(true);
     this.ui.showPhase(-1);
   }
 
@@ -236,7 +248,7 @@ export class App {
     if (on === this.ghosted) return;
     this.ghosted = on;
     if (on) {
-      const ghost = new THREE.MeshStandardMaterial({ color: 0xc9d6e2, transparent: true, opacity: 0.16, depthWrite: false, roughness: 0.4, metalness: 0.1 });
+      const ghost = this.effects.ghost;
       this.models.building.traverse((o) => {
         const m = o as THREE.Mesh;
         if (!m.isMesh || m.userData.node === 'Foundation') return;
@@ -386,7 +398,7 @@ export class App {
       for (const l of this.effects.layerLabelPositions()) out.push(this.project(l.pos, `layer:${l.id}`));
     }
     if (this.mode === 'parking' && this.effects.parking) {
-      for (const [i, lv] of ['B1', 'B2', 'B3'].entries()) out.push(this.project(siteToWorld(-6, 16, -1.8 - i * 3.6), `level:${lv}`));
+      for (const [i, lv] of ['B1', 'B2', 'B3'].entries()) out.push(this.project(siteToWorld(-3, 8 + i * 16, -1.6 - i * 3.6), `level:${lv}`));
     }
     if (this.mode === 'location') {
       for (const pin of this.location.pins.values()) {

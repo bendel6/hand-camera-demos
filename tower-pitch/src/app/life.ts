@@ -399,7 +399,9 @@ class Crowd {
     const per = paths.map((p) => Math.max(2, Math.round(polyLen(p.pts) / 9)));
     const total = per.reduce((a, b) => a + b, 0);
     this.im = new InstancedProto(proto, total, parent, { colorMat: 'M_Person' });
-    const mat = this.im.meshes[0].material as THREE.MeshStandardMaterial;
+    const mat = (this.im.meshes[0].material as THREE.MeshStandardMaterial).clone();
+    mat.userData = {};
+    this.im.meshes[0].material = mat;
     mat.vertexColors = true;
     const uniforms = this.uniforms;
     mat.userData.shaderKey = 'walk';

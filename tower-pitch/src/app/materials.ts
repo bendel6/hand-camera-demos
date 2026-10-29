@@ -164,9 +164,10 @@ export function upgradeMaterials(root: THREE.Object3D, kind: 'building' | 'site'
   root.traverse((o) => {
     const mesh = o as THREE.Mesh;
     if (!mesh.isMesh) return;
-    let node: THREE.Object3D | null = mesh;
-    while (node && node.parent && !/^(A|B|P|PK|S)_|^Foundation$/.test(node.name)) node = node.parent;
-    const nodeName = node?.name ?? mesh.name;
+    // the layer node is the direct child of the GLB's root empty (Building / Site / Parking)
+    let node: THREE.Object3D = mesh;
+    while (node.parent && node.parent !== root && !/^(Building|Site|Parking|Scene|AuxScene)$/.test(node.parent.name)) node = node.parent;
+    const nodeName = node.name || mesh.name;
     const role: FxRole = kind === 'building' ? roleForNode(nodeName) : kind === 'parking' ? 'parking' : 'site';
     mesh.userData.role = role;
     mesh.userData.node = nodeName;

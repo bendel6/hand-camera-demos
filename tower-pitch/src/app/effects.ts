@@ -46,6 +46,11 @@ export class Effects {
   layerNodes = new Map<string, THREE.Object3D[]>();
   basePos = new Map<THREE.Object3D, THREE.Vector3>();
   private ghostMat: THREE.ShaderMaterial;
+  /** Fresnel ghost used to fade the building in the parking cutaway. */
+  get ghost() {
+    this.ghostMat.uniforms.uOpacity.value = 0.14;
+    return this.ghostMat;
+  }
   private glowMat: THREE.MeshStandardMaterial;
   private liftMat: THREE.MeshStandardMaterial;
   private edgeMat!: THREE.LineBasicMaterial;
@@ -196,7 +201,15 @@ export class Effects {
   }
 
   // ------------------------------------------------------------------ parking cutaway
-  async setParking(on: boolean, props: THREE.Object3D, ghostBuilding: (v: boolean) => void) {
+  /** Cut depth that exposes a level from above (just below the slab above it). */
+  static LEVEL_CUT: Record<string, number> = { B1: -0.45, B2: -4.0, B3: -7.6 };
+  parkingLevel = 'B1';
+
+  /**
+   * Parking reveal: the building and ground over the plot are sliced away from the top down, then the three
+   * basement levels are peeled one after another (B1 -> B2 -> B3) and the view returns to B1.
+   */
+  async setParking(on: boolean, props: THREE.Object3D, onLevel?: (level: string) => void) {
     this.parking = on;
     if (on) {
       const pk = await this.models.loadParking();
@@ -205,25 +218,35 @@ export class Effects {
       this.parkingCars.visible = true;
       if (!this.soil) this.soil = this.buildSoil();
       this.soil.visible = true;
-      ghostBuilding(true);
       FX.uCutOn.value = 1;
-      FX.uCutMin.value.set(-40, 0.3, -30);
-      FX.uCutMax.value.set(130, 0.3, 0.6);
-      await gsap.to(FX.uCutMax.value, { y: 30, duration: 1.6, ease: 'power2.inOut' });
-      // light the levels one by one
-      const levels = ['B1', 'B2', 'B3'];
-      for (let i = 0; i < levels.length; i++) {
-        this.levelGlow(levels[i], 1.6, 0.35 + i * 0.45);
+      FX.uCutMin.value.set(-0.6, -0.7, 130);
+      FX.uCutMax.value.set(82.2, 67.4, 400);
+      await gsap.to(FX.uCutMin.value, { z: Effects.LEVEL_CUT.B1, duration: 2.8, ease: 'power2.inOut' });
+      for (const [i, lv] of ['B1', 'B2', 'B3'].entries()) {
+        if (!this.parking) return;
+        this.parkingLevel = lv;
+        onLevel?.(lv);
+        this.levelGlow(lv, 1.8, 0);
+        if (i > 0) await gsap.to(FX.uCutMin.value, { z: Effects.LEVEL_CUT[lv], duration: 1.4, ease: 'power2.inOut' });
+        await new Promise((r) => setTimeout(r, 1700));
       }
+      if (!this.parking) return;
+      await this.showLevel('B1');
+      onLevel?.('B1');
     } else {
-      await gsap.to(FX.uCutMax.value, { y: 0.3, duration: 1.0, ease: 'power2.inOut' });
+      await gsap.to(FX.uCutMin.value, { z: 130, duration: 1.6, ease: 'power2.inOut' });
       FX.uCutOn.value = 0;
-      ghostBuilding(false);
       if (this.models.parking) this.models.parking.visible = false;
       if (this.parkingCars) this.parkingCars.visible = false;
       if (this.soil) this.soil.visible = false;
       for (const l of ['B1', 'B2', 'B3']) this.levelGlow(l, 0, 0);
     }
+  }
+
+  showLevel(level: string) {
+    this.parkingLevel = level;
+    this.levelGlow(level, 1.8, 0);
+    return gsap.to(FX.uCutMin.value, { z: Effects.LEVEL_CUT[level], duration: 1.2, ease: 'power2.inOut' });
   }
 
   levelGlow(level: string, intensity: number, delay: number) {
@@ -254,7 +277,17 @@ export class Effects {
         const mesh = o as THREE.Mesh;
         if (!mesh.isMesh) return;
         const local = inv.clone().multiply(mesh.matrixWorld);
-        const im = new THREE.InstancedMesh(mesh.geometry, mesh.material, mine.length);
+        let mat = mesh.material as THREE.MeshStandardMaterial;
+        if (mat.name === 'M_CarPaint') {
+          // parked cars sit in the shaded pit: a less metallic paint reads better than mirror-like flakes
+          mat = mat.clone();
+          mat.userData = {};
+          mat.name = 'M_CarPaint';
+          mat.metalness = 0.15;
+          mat.roughness = 0.38;
+          applyFx(mat, 'site');
+        }
+        const im = new THREE.InstancedMesh(mesh.geometry, mat, mine.length);
         const m = new THREE.Matrix4();
         const q = new THREE.Quaternion();
         mine.forEach((c, i) => {
@@ -263,7 +296,7 @@ export class Effects {
           q.setFromAxisAngle(UP, SITE_ROT + (c.facing > 0 ? -Math.PI / 2 : Math.PI / 2));
           m.compose(p, q, new THREE.Vector3(1, 1, 1)).multiply(local);
           im.setMatrixAt(i, m);
-          if ((mesh.material as THREE.Material).name === 'M_CarPaint') im.setColorAt(i, new THREE.Color(cols[(i * 5 + ki) % cols.length]).convertSRGBToLinear());
+          if (mat.name === 'M_CarPaint') im.setColorAt(i, new THREE.Color(cols[(i * 5 + ki) % cols.length]).convertSRGBToLinear());
         });
         im.castShadow = false;
         im.receiveShadow = true;
@@ -294,16 +327,17 @@ export class Effects {
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
     mat.map = tex;
-    applyFx(mat, 'site', { cut: true });
-    const blocks: Array<[number, number, number, number]> = [
-      [-30, -30, 0, 80], [81.5, -30, 110, 80], [0, 66.5, 81.5, 80], [0, -30, 81.5, 0.4],
+    applyFx(mat, 'site', { cut: false });
+    const blocks: Array<[number, number, number, number, number, number]> = [
+      [-12, -8, -0.4, 76, -14, -0.06], [82.2, -8, 94, 76, -14, -0.06], [-0.4, 67.4, 82.2, 76, -14, -0.06],
+      [-0.4, -8, 82.2, -0.7, -14, -0.2], [-0.4, -0.7, 82.2, 67.4, -16, -12.62],
     ];
-    for (const [x0, y0, x1, y1] of blocks) {
-      const geo = new THREE.BoxGeometry(x1 - x0, 14, y1 - y0);
+    for (const [x0, y0, x1, y1, z0, z1] of blocks) {
+      const geo = new THREE.BoxGeometry(x1 - x0, z1 - z0, y1 - y0);
       const uv = geo.attributes.uv as THREE.BufferAttribute;
       for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * 2, uv.getY(i));
       const mesh = new THREE.Mesh(geo, mat);
-      const p = siteToWorld((x0 + x1) / 2, (y0 + y1) / 2, -7.05);
+      const p = siteToWorld((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
       mesh.position.copy(p);
       mesh.rotation.y = SITE_ROT;
       g.add(mesh);

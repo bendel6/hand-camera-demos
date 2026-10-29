@@ -17,7 +17,7 @@ export const VIEWS = {
   overview: view(-95, -150, 95, 42, 34, 42),
   intro0: view(-900, -1400, 900, 40, 30, 40),
   entrance: view(36, -36, 4.2, 44, 0, 5.5),
-  parking: view(128, -26, 30, 40, 30, -6),
+  parking: view(-30, -48, 72, 40, 30, -6),
   green: view(108, 98, 46, 64, 44, 4),
   rooftop: view(-10, -18, 48, 30, 18, 9.6),
   facade: view(74, -16, 44, 60, 2.1, 46),

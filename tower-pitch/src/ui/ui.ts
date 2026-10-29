@@ -398,7 +398,14 @@ export class UI {
 
   private flyLevel(level: string) {
     const z = { B1: -3.6, B2: -7.2, B3: -10.8 }[level]!;
-    import('../app/flight').then(({ view }) => this.app.flight.to(view(40, 22, z + 1.7, 40, 48, z + 1.2), 2.2, { arc: 4 }));
+    this.app.effects.showLevel(level);
+    this.onParkingLevel(level);
+    import('../app/flight').then(({ view }) => this.app.flight.to(view(10, 10, z + 9, 44, 40, z + 0.5), 2.4, { arc: 6 }));
+  }
+
+  onParkingLevel(level: string) {
+    this.card.querySelectorAll('.lvl').forEach((e) => e.classList.toggle('on', (e.querySelector('b') as HTMLElement).textContent === level));
+    for (const [k, e] of this.labels) if (k.startsWith('level:')) e.classList.toggle('cur', k === `level:${level}`);
   }
 
   openPoi(id: string, fly = true) {
