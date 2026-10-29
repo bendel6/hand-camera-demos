@@ -263,7 +263,7 @@ def add_interiors(tod):
     lit = {"day": 0.08, "golden": 0.22, "blue": 0.55, "night": 0.62}[tod]
     strength = {"day": 0.0, "golden": 3.0, "blue": 6.0, "night": 7.0}[tod]
     mat = interior_material("STILL_interior", lit, strength)
-    smat = interior_material("STILL_shops", 0.95, {"day": 0.9, "golden": 2.2, "blue": 7.0, "night": 8.0}[tod], shop=True)
+    smat = interior_material("STILL_shops", 0.9, {"day": 0.35, "golden": 0.9, "blue": 4.5, "night": 5.5}[tod], shop=True)
     root = site_root()
     acc = lib.MeshAccum("Interiors")
     for poly, floors in ((TOWER_A, 30), (TOWER_B, 16)):
@@ -336,13 +336,15 @@ def instance(col, name, parent, loc, rot=0.0, scale=1.0):
     return e
 
 
-def add_trees(cols, rnd):
+def add_trees(cols, rnd, real_city=False):
     root = site_root()
     for i, t in enumerate(LAYOUT["trees"]):
         kind = t["t"] if t["t"] in cols else None
-        if not kind:
+        if not kind or (real_city and t["y"] < -26.0):
             continue
         instance(cols[kind], f"tree_{i}", root, (t["x"], t["y"], t["z"]), t["r"], t["s"])
+    if real_city:
+        return  # the photogrammetry already contains the neighbourhood's trees
     # real neighbourhood trees (three.js coords -> blender ENU)
     data = json.load(open(os.path.join(lib.ROOT, "data", "trees-near.json")))["trees"]
     c, s = math.cos(SITE_ROT), math.sin(SITE_ROT)
@@ -574,6 +576,129 @@ def render(preset, res, samples, out):
     print("wrote", out)
 
 
+GTILES = os.path.join(lib.OUT, "gtiles")
+
+
+def site_xy(x, y):
+    """ENU (east, north) -> site frame (x along the avenue, y into the plot)."""
+    c, s = math.cos(SITE_ROT), math.sin(SITE_ROT)
+    return x * c + y * s, -x * s + y * c
+
+
+def import_google_tiles():
+    """Real city: Google Photorealistic 3D Tiles converted by scripts/google_tiles.mjs. Levels the tileset to the
+    street in front of the plot, flattens the old buildings on the plot and the modelled stretch of Kazbegi Ave
+    (where the project's own street, trees and furniture take over) and gives the photogrammetry a matte material
+    that keeps its captured colours."""
+    import bmesh
+    man = json.load(open(os.path.join(GTILES, "manifest.json")))
+    objs = []
+    for t in man["tiles"]:
+        objs += [o for o in import_glb(os.path.join(GTILES, t["file"])) if o.type == "MESH"]
+    # one shared node setup per texture: base colour from the photo, a little emission so captured shadows
+    # are not double-darkened by the render's own lighting
+    for o in objs:
+        for slot in o.material_slots:
+            m = slot.material
+            if not m or m.get("gt_done"):
+                continue
+            nt = m.node_tree
+            img = next((n for n in nt.nodes if n.type == "TEX_IMAGE"), None)
+            bs = nt.nodes.get("Principled BSDF")
+            if bs:
+                bs.inputs["Roughness"].default_value = 0.92
+                bs.inputs["Specular IOR Level"].default_value = 0.25
+                if img:
+                    nt.links.new(img.outputs["Color"], bs.inputs["Emission Color"])
+                    bs.inputs["Emission Strength"].default_value = 0.18
+            m["gt_done"] = True
+    # level: street surface in front of the plot = 0
+    deps = bpy.context.evaluated_depsgraph_get()
+    probe = mathutils.Vector((0, 0, 600))
+    c, s = math.cos(SITE_ROT), math.sin(SITE_ROT)
+    sx, sy = 40.0, -14.0
+    probe.x, probe.y = sx * c - sy * s, sx * s + sy * c
+    hit, loc, *_ = bpy.context.scene.ray_cast(deps, probe, mathutils.Vector((0, 0, -1)))
+    dz = -loc.z if hit else 0.0
+    print("gtiles level shift", round(dz, 2))
+    from shapely.geometry import Point, Polygon, box
+    flat_plot = Polygon([(-1.5, -1.0), (81.5, -1.0), (83.0, 66.0), (-1.0, 68.5)])
+    flat_street = box(-170, -26.0, 260, -1.0)
+    for o in objs:
+        o.location.z += dz
+        bm = bmesh.new()
+        bm.from_mesh(o.data)
+        mw = o.matrix_world
+        for v in bm.verts:
+            w = mw @ v.co
+            px, py = site_xy(w.x, w.y)
+            pt = Point(px, py)
+            if flat_plot.contains(pt):
+                if w.z > 0.0:
+                    v.co.z = (mw.inverted() @ mathutils.Vector((w.x, w.y, -0.25))).z
+            elif flat_street.contains(pt) and w.z > 0.05:
+                v.co.z = (mw.inverted() @ mathutils.Vector((w.x, w.y, -0.12))).z
+        bm.to_mesh(o.data)
+        bm.free()
+    return objs
+
+
+def build_scene(tod, cam=None, use_gtiles=None):
+    """Assemble everything for a time of day. Returns True when the real (Google) city was used."""
+    night = tod in ("night", "blue")
+    rnd = random.Random(11)
+    bpy.ops.wm.open_mainfile(filepath=os.path.join(lib.OUT, "building.blend"))
+    append_blend(os.path.join(lib.OUT, "site.blend"), "Site")
+    before = bpy.data.objects.get("S_before")
+    if before:
+        before.hide_render = True
+    if use_gtiles is None:
+        use_gtiles = os.path.exists(os.path.join(GTILES, "manifest.json"))
+    if use_gtiles:
+        import_google_tiles()
+        # the real city has its own buildings and trees across the avenue: drop the assumed green strip
+        import bmesh
+        g = bpy.data.objects.get("S_ground")
+        if g:
+            bm = bmesh.new()
+            bm.from_mesh(g.data)
+            kill = [f for f in bm.faces if f.calc_center_median().y < -26.0]
+            bmesh.ops.delete(bm, geom=kill, context="FACES")
+            bm.to_mesh(g.data)
+            bm.free()
+    else:
+        ctx = import_glb(os.path.join(lib.OUT, "context_raw.glb"))
+        cmat = context_material(night)
+        for o in ctx:
+            if o.type != "MESH":
+                continue
+            if o.name.startswith("ctx_terrain"):
+                gm, nt, out_n = node_mat("STILL_ground")
+                tex = nt.nodes.new("ShaderNodeTexImage")
+                tex.image = bpy.data.images.load(os.path.join(lib.ROOT, "public", "textures", "ground.webp"))
+                bs = nt.nodes.new("ShaderNodeBsdfPrincipled")
+                bs.inputs["Roughness"].default_value = 0.95
+                hsv = nt.nodes.new("ShaderNodeHueSaturation")
+                hsv.inputs["Value"].default_value = 0.8
+                nt.links.new(tex.outputs["Color"], hsv.inputs["Color"])
+                nt.links.new(hsv.outputs["Color"], bs.inputs["Base Color"])
+                nt.links.new(bs.outputs[0], out_n.inputs["Surface"])
+                o.data.materials.clear()
+                o.data.materials.append(gm)
+                o.location.z -= 0.03
+            else:
+                o.data.materials.clear()
+                o.data.materials.append(cmat)
+    tune_materials(tod)
+    add_interiors(tod)
+    cols = tree_collections()
+    add_trees(cols, rnd, real_city=use_gtiles)
+    add_cars(rnd, night, cam)
+    add_people(rnd)
+    add_street_lights(night)
+    return use_gtiles
+
+
 def main():
     args = sys.argv[1:]
     if "--list" in args:
@@ -584,46 +709,8 @@ def main():
     samples = int(args[args.index("--samples") + 1]) if "--samples" in args else 384
     out = args[args.index("--out") + 1] if "--out" in args else os.path.join(lib.OUT, f"still_{preset}.png")
     p = PRESETS[preset]
-    tod = p["tod"]
-    night = tod in ("night", "blue")
-    rnd = random.Random(11)
-    bpy.ops.wm.open_mainfile(filepath=os.path.join(lib.OUT, "building.blend"))
-    append_blend(os.path.join(lib.OUT, "site.blend"), "Site")
-    before = bpy.data.objects.get("S_before")
-    if before:
-        before.hide_render = True
-    ctx = import_glb(os.path.join(lib.OUT, "context_raw.glb"))
-    cmat = context_material(night)
-    ground = None
-    for o in ctx:
-        if o.type != "MESH":
-            continue
-        if o.name.startswith("ctx_terrain"):
-            ground = o
-            gm, nt, out_n = node_mat("STILL_ground")
-            tex = nt.nodes.new("ShaderNodeTexImage")
-            tex.image = bpy.data.images.load(os.path.join(lib.ROOT, "public", "textures", "ground.webp"))
-            bs = nt.nodes.new("ShaderNodeBsdfPrincipled")
-            bs.inputs["Roughness"].default_value = 0.95
-            hsv = nt.nodes.new("ShaderNodeHueSaturation")
-            hsv.inputs["Value"].default_value = 0.8
-            nt.links.new(tex.outputs["Color"], hsv.inputs["Color"])
-            nt.links.new(hsv.outputs["Color"], bs.inputs["Base Color"])
-            nt.links.new(bs.outputs[0], out_n.inputs["Surface"])
-            o.data.materials.clear()
-            o.data.materials.append(gm)
-            o.location.z -= 0.03
-        else:
-            o.data.materials.clear()
-            o.data.materials.append(cmat)
-    tune_materials(tod)
-    add_interiors(tod)
-    cols = tree_collections()
-    add_trees(cols, rnd)
-    add_cars(rnd, night, p["cam"])
-    add_people(rnd)
-    add_street_lights(night)
-    setup_world(tod, *p["sun"])
+    build_scene(p["tod"], p["cam"], use_gtiles=False if "--no-gtiles" in args else None)
+    setup_world(p["tod"], *p["sun"])
     setup_camera(p)
     if "--blend" in args:
         bpy.ops.wm.save_as_mainfile(filepath=os.path.join(lib.OUT, f"stills_{preset}.blend"))
