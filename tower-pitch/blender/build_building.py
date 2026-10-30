@@ -26,25 +26,27 @@ PLOT = [(0, 0), (79.4, 0), (81.3, 64.2), (0.5, 66.7)]
 PODIUM = [(5.7, 0), (80.9, 0), (80.9, 31.2), (68.8, 31.2), (68.8, 14.8), (55.1, 14.8), (55.1, 46.4),
           (35.8, 46.4), (35.8, 56.4), (10.8, 56.4), (10.8, 46.4), (5.7, 46.4)]
 TOWER_A = [(10.8, 26.4), (35.8, 26.4), (35.8, 56.4), (10.8, 56.4)]
-TOWER_B = [(36.9, 2.1), (78.9, 2.1), (78.9, 14.8), (54.7, 14.8), (54.7, 22.6), (36.9, 22.6)]  # 42 m wide per renders p05/p07/p08 (site plan sketch: 34 m)
-A_FLOORS, B_FLOORS = 30, 16
+TOWER_B = [(36.9, 2.1), (71.1, 2.1), (71.1, 14.8), (54.7, 14.8), (54.7, 22.6), (36.9, 22.6)]
+A_FLOORS, B_FLOORS = 28, 14  # "30-storey" / "16-storey" in the note include the 2 podium floors
 B_SPLIT_X = 49.3  # fin zone / framed balcony zone boundary on Tower B (renders p07 / p08: ~37 / 63)
 
 
 def crown_a(x, y):
-    """Tower A crown (render p05, camera solved to <20 px; also p01): a steep diagonal cut. Peak +115.0 at the SW
-    corner; the avenue (south) face falls ~18 m to the east, the west face ~26 m to the north."""
+    """Tower A crown (renders p01, p05, p06, photomontages p09 / p10): a twisted fan. The SW and NE corners are
+    high (+115.0), SE and NW low (+108.6); in between the crown is the ruled (bilinear) surface traced by the
+    blades that continue the south and north fins across the roof."""
     s_ = min(max((x - 10.8) / 25.0, 0.0), 1.0)
     t_ = min(max((y - 26.4) / 30.0, 0.0), 1.0)
-    return 115.0 - 18.0 * s_ - 26.0 * t_
+    hi, lo = 115.0, 108.6
+    return hi * (1 - s_) * (1 - t_) + lo * s_ * (1 - t_) + lo * (1 - s_) * t_ + hi * s_ * t_
 
 
 def crown_b(x, y):
-    """Tower B crown (renders p05 / p07): peak +67.5 at the fin/frame junction; the frame top falls ~11.5 m east
-    and the fins step down ~7.5 m west, cutting the top floors at both ends."""
-    if x >= B_SPLIT_X:
-        return 67.5 - 11.5 * ((x - B_SPLIT_X) / (78.9 - B_SPLIT_X))
-    return 67.5 - 7.5 * ((B_SPLIT_X - x) / (B_SPLIT_X - 36.9))
+    """Tower B crown (renders p05, p07, photomontage p10): peak +66.0 at the SW corner where the west fin face
+    meets the framed south face; the frame falls east and the fins step down north (to ~+57.7)."""
+    s_ = min(max((x - 36.9) / 34.2, 0.0), 1.0)
+    t_ = min(max((y - 2.1) / 20.5, 0.0), 1.0)
+    return max(57.2, 66.0 - 8.3 * s_ - 8.3 * t_)
 
 
 # ------------------------------------------------------------------------------------------------ materials
@@ -167,15 +169,6 @@ def balcony_zone(F, G, M, p0, d, n, u0, u1, z0, floors, crown, post0=True, post1
             fprofile(F, p0, d, n, pa, pb, w_glass, w_front, z0, crown, M["frame"], steps=2)
     panel_bottom = lambda x, y: last_floor_top(crown, x, y, z0, floors)  # noqa: E731
     fprofile(F, p0, d, n, a, b, -0.25, w_front, panel_bottom, crown, M["frame"], steps=32)
-    steps = 16
-    for k in range(steps):  # LED line tracing the crown's top edge (lit at night)
-        ua = a + (b - a) * k / steps
-        ub = a + (b - a) * (k + 1) / steps
-        xa, ya, _ = to_world(p0, d, n, ua, 0, 0)
-        xb, yb, _ = to_world(p0, d, n, ub, 0, 0)
-        za, zb = crown(xa, ya) - 0.25, crown(xb, yb) - 0.25
-        F.poly([to_world(p0, d, n, ua, w_front + 0.012, za - 0.1), to_world(p0, d, n, ub, w_front + 0.012, zb - 0.1),
-                to_world(p0, d, n, ub, w_front + 0.012, zb), to_world(p0, d, n, ua, w_front + 0.012, za)], M["led"])
     span = b - a
     ndiv = max(1, round(span / 2.3))
     def top_at(u):
@@ -188,11 +181,7 @@ def balcony_zone(F, G, M, p0, d, n, u0, u1, z0, floors, crown, post0=True, post1
         zt = min(top_at(ua), top_at(ub))
         if zt > z0:
             fquad(G, p0, d, n, ua, ub, w_glass, z0, zt, M["glass_res"])
-    # dark posts between apartments (continuous through the floors) and glazing mullions between them
-    for k in range(1, ndiv):
-        u = a + span * k / ndiv
-        if top_at(u) > z0:
-            fbox(F, p0, d, n, u - 0.18, u + 0.18, w_glass, w_glass + 0.14, z0, top_at(u), M["spandrel"], skip=("-z", "+z"))
+    # slim glazing mullions (three panes per apartment bay)
     for k in range(ndiv):
         ua, ub = a + span * k / ndiv, a + span * (k + 1) / ndiv
         for j in (1, 2):
@@ -249,10 +238,10 @@ def fblade(acc, p0, d, n, u0, u1, wb, wf, z0, zt_back, zt_front, m):
         acc.poly(q[::-1], m)
 
 
-def fin_zone(F, G, M, p0, d, n, u0, u1, z0, floors, crown, corner0=True, corner1=True, bay=4.1):
+def fin_zone(F, G, M, p0, d, n, u0, u1, z0, floors, crown, corner0=True, corner1=True, bay=4.1, fin_extra=0.0):
     """Vertical-fin zone (renders p05 / p08): deep slate blades with pointed tops that rise in steps to the crown,
     bays with a light parapet panel below each window, mullioned glazing and a dark spandrel at every slab."""
-    w_glass, w_fin = -0.6, 1.0
+    w_glass, w_fin = -0.6, 0.35
     ztop = z0 + floors * FH
     span = u1 - u0
     nb = max(1, round(span / bay))
@@ -268,13 +257,9 @@ def fin_zone(F, G, M, p0, d, n, u0, u1, z0, floors, crown, corner0=True, corner1
     tops = []
     for fa, fb in fins:
         x, y, _ = to_world(p0, d, n, (fa + fb) / 2, 0, 0)
-        top = crown(x, y) + 2.6
+        top = crown(x, y) + fin_extra
         tops.append(top)
-        fblade(F, p0, d, n, fa, fb, w_glass, w_fin, z0, top, top - 1.9, M["fin"])
-        uc = (fa + fb) / 2
-        F.poly([to_world(p0, d, n, uc - 0.05, w_fin + 0.012, top - 9.0), to_world(p0, d, n, uc + 0.05, w_fin + 0.012, top - 9.0),
-                to_world(p0, d, n, uc + 0.05, w_fin + 0.012, top - 2.1), to_world(p0, d, n, uc - 0.05, w_fin + 0.012, top - 2.1)],
-               M["led"])
+        fbox(F, p0, d, n, fa, fb, w_glass, w_fin, z0, top, M["fin"])
     for k in range(nb):
         a, b = fins[k][1], fins[k + 1][0]
         bw = b - a
@@ -282,28 +267,23 @@ def fin_zone(F, G, M, p0, d, n, u0, u1, z0, floors, crown, corner0=True, corner1
         gtop = last_floor_top(crown, xg, yg, z0, floors)
         if gtop > z0:
             fquad(G, p0, d, n, fins[k][0], fins[k + 1][1], w_glass, z0, gtop, M["glass_res"])
-        # crown screen between the blades, kept well below them so the blades read as a sawtooth
-        xc, yc, _ = to_world(p0, d, n, (a + b) / 2, 0, 0)
-        bay_top = last_floor_top(crown, xc, yc, z0, floors)
-        infill_top = min(tops[k], tops[k + 1]) - 3.4
-        if infill_top > bay_top:
-            fbox(F, p0, d, n, a, b, w_glass, w_glass + 0.15, bay_top, infill_top, M["spandrel"])
+        bay_top = gtop
         nmul = 1 if bw < 2.6 else 2
         for i in range(floors):
             z = z0 + i * FH
             if z + FH > bay_top + 0.01:
                 break
-            fbox(F, p0, d, n, a, b, w_glass, w_glass + 0.14, z, z + 0.62, M["sill"])  # light parapet panel
-            fbox(F, p0, d, n, a, b, w_glass, w_glass + 0.16, z + 0.62, z + 0.69, M["mullion"])
+            fbox(F, p0, d, n, a, b, w_glass, w_glass + 0.3, z, z + 1.0, M["sill"])  # light balcony parapet box
+            fbox(F, p0, d, n, a, b, w_glass, w_glass + 0.32, z + 1.0, z + 1.06, M["mullion"])
             fbox(F, p0, d, n, a, b, w_glass, w_glass + 0.08, z + FH - 0.3, z + FH, M["spandrel"], skip=("-z",))
             for j in range(1, nmul + 1):
                 u = a + bw * j / (nmul + 1)
-                fbox(F, p0, d, n, u - 0.03, u + 0.03, w_glass, w_glass + 0.1, z + 0.69, z + FH - 0.3, M["mullion"],
+                fbox(F, p0, d, n, u - 0.03, u + 0.03, w_glass, w_glass + 0.1, z + 1.06, z + FH - 0.3, M["mullion"],
                      skip=("-z", "+z"))
         fbox(F, p0, d, n, a, b, w_glass, w_glass + 0.2, bay_top - 0.3, bay_top, M["spandrel"])
 
 
-def tower(T, poly, floors, crown, faces, M, col, bay=4.1):
+def tower(T, poly, floors, crown, faces, M, col, bay=4.1, fin_extra=0.0, roof_blades=False):
     """faces: list of per-edge specs: ('fin'|'bal'|('split', x_split, first_kind)), per CCW edge of poly."""
     dirs = []
     z0 = PODIUM_TOP
@@ -319,7 +299,7 @@ def tower(T, poly, floors, crown, faces, M, col, bay=4.1):
             dirs.append(key)
         F, G = accs[key]
         if spec == "fin":
-            fin_zone(F, G, M, p0, d, n, 0, L, z0, floors, crown, bay=bay)
+            fin_zone(F, G, M, p0, d, n, 0, L, z0, floors, crown, bay=bay, fin_extra=fin_extra)
         elif spec == "bal":
             balcony_zone(F, G, M, p0, d, n, 0, L, z0, floors, crown)
         else:
@@ -335,17 +315,30 @@ def tower(T, poly, floors, crown, faces, M, col, bay=4.1):
     for k in dirs:
         for a in accs[k]:
             objs.append(a.build(col))
-    # roof slab + membrane + plant + lift overrun
+    # flat roof (light membrane, photomontage p10) + plant
     shp = Polygon(poly).buffer(-0.4, join_style=2)
     roof = MeshAccum(f"{T}_crown")
     ring = list(shp.exterior.coords)[:-1]
-    rz = [crown(x, y) - 1.2 for x, y in ring]
-    roof.poly([(x, y, z) for (x, y), z in zip(ring, rz)], M["roof"])
-    roof.poly([(x, y, z - 0.35) for (x, y), z in zip(ring[::-1], rz[::-1])], M["roof"])
+    roof.prism(ring, ztop - 0.3, ztop + 0.08, M["roof"])
     cx, cy = shp.centroid.x, shp.centroid.y
-    zr = min(crown(cx + dx, cy + dy) for dx in (-7, 7) for dy in (-3, 3)) - 1.55
-    roof.box(cx - 3, cy - 2.5, zr, cx + 3, cy + 2.5, zr + 1.2, M["plant"])
-    roof.box(cx + 3.5, cy - 1.5, zr, cx + 6.5, cy + 1.5, zr + 0.9, M["plant"])
+    roof.box(cx - 3, cy - 2.5, ztop, cx + 3, cy + 2.5, ztop + 2.2, M["plant"])
+    roof.box(cx + 3.5, cy - 1.5, ztop, cx + 6.5, cy + 1.5, ztop + 1.6, M["plant"])
+    if roof_blades:
+        # the fins of the south and north faces run on across the roof as blades whose tops trace the twisted crown
+        x0, y0, x1, y1 = Polygon(poly).bounds
+        nb = max(1, round((x1 - x0) / bay))
+        for k in range(nb + 1):
+            xc = x0 + (x1 - x0) * k / nb
+            xa, xb = (xc, xc + 0.8) if k == 0 else ((xc - 0.8, xc) if k == nb else (xc - 0.24, xc + 0.24))
+            xm = (xa + xb) / 2
+            ya, yb = y0 + 0.2, y1 - 0.2
+            za, zb = crown(xm, ya), crown(xm, yb)
+            prof = [(ya, ztop), (yb, ztop), (yb, zb), (ya, za)]
+            for xx, sgn in ((xa, -1), (xb, 1)):
+                pts = [(xx, yy, zz) for yy, zz in prof]
+                roof.poly(pts if sgn > 0 else pts[::-1], M["fin"])
+            for (yp, zp), (yq, zq) in zip(prof, prof[1:] + prof[:1]):
+                roof.poly([(xa, yp, zp), (xb, yp, zp), (xb, yq, zq), (xa, yq, zq)][::-1], M["fin"])
     objs.append(roof.build(col))
     return objs
 
@@ -443,7 +436,7 @@ def podium(M, col):
         fbox(F, p0, d, nn, -0.15, L + 0.15, -0.35, 0.15, 8.3, PODIUM_TOP + 0.05, M["red"])
         piers = []
         if south:
-            piers = [(48.3 - p0[0], 49.9 - p0[0]), (65.5 - p0[0], 67.1 - p0[0])]
+            piers = [(45.9 - p0[0], 47.5 - p0[0]), (60.2 - p0[0], 61.8 - p0[0])]
         lobby = (piers[0][1], piers[1][0]) if piers else None
         for u0, u1 in piers:
             fbox(F, p0, d, nn, u0, u1, -0.35, 0.35, 0, 8.3, M["red"])
@@ -583,9 +576,9 @@ def main():
     M = materials()
     col = bpy.context.scene.collection
     objs = []
-    objs += tower("A", TOWER_A, A_FLOORS, crown_a, ["fin", "bal", "fin", "bal"], M, col)
-    objs += tower("B", TOWER_B, B_FLOORS, crown_b,
-                  [("split", B_SPLIT_X, "fin"), "bal", "fin", "bal", ("split", B_SPLIT_X, "bal"), "fin"], M, col, bay=2.3)
+    objs += tower("A", TOWER_A, A_FLOORS, crown_a, ["fin", "bal", "fin", "bal"], M, col, bay=4.1, roof_blades=True)
+    objs += tower("B", TOWER_B, B_FLOORS, crown_b, ["bal", "fin", "bal", "fin", "bal", "fin"], M, col, bay=3.4,
+                  fin_extra=1.2)
     objs += structure("A", TOWER_A, A_FLOORS, (18.8, 35.4, 27.8, 47.4), 3, 2, M, col, crown=crown_a)
     objs += structure("B", TOWER_B, B_FLOORS, (42.3, 7.85, 49.3, 16.85), 2, 1, M, col, crown=crown_b)
     objs += podium(M, col)

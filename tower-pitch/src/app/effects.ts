@@ -201,7 +201,7 @@ export class Effects {
     if (!on) return;
     this.models.building.traverse((o) => {
       if (/^(A|B)_lift_\d$/.test(o.name)) {
-        const floors = o.name.startsWith('A') ? 30 : 16;
+        const floors = o.name.startsWith('A') ? 28 : 14;
         const top = (floors - 1) * 3.3 + 9.6;
         const t = gsap.to(o.position, { [this.upAxis(o)]: top, duration: 6 + Math.random() * 4, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: Math.random() * 3 });
         this.liftTweens.push(t);

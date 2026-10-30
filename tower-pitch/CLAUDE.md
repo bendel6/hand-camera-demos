@@ -144,13 +144,51 @@
   and GOOGLE_MAPS_SERVER_KEY (Places/Routes/Geocoding, used only by scripts/fetch-poi.mjs, never shipped).
 - Vercel deploys go through the Vercel connector (team "bendel's projects").
 
-## Status and next steps (cinematic real-city renders)
-The user wants Blender-quality renders/reels with the ACTUAL city (photoreal), and the towers 1:1 with the architect's
-renders. Done: render-matched facades and crowns (camera solved from render p05, see notes/compare_p05_*.jpg),
-tower B widened to 42 m per renders, `blender/stills.py` (stills, presets incl. `match_p05_dusk`) and
-`blender/reels.py` (drone reels, vertical 1080x1920, resumable, ffmpeg encode).
-Real city needs the Google Map Tiles key (env secret GOOGLE_MAPS_BROWSER_KEY). With it:
-  1. `node scripts/google_tiles.mjs --radius 900 --far 2600` -> blender/out/gtiles (Draco decoded, ECEF->site ENU)
-  2. `blender/stills.py <preset>` and `blender/reels.py <reel>` pick the tiles up automatically (levelled to the street,
-     plot + modelled avenue flattened, "Google" attribution burned into videos).
-CPU-only container: reels take ~1-2 min/frame at 1080x1920; offer the .blend (`--blend`) for the user's RTX PC.
+## Status and next steps (handoff to a local session, 2026-10-30)
+
+### Building model: current design reading (blender/build_building.py)
+- **Floors:** "30-storey / 16-storey" in the note include the 2 podium floors, so Tower A has 28 residential floors
+  (roof +102.0) and Tower B has 14 (roof +55.8). Floor-to-floor is 3.3 m; podium +9.6.
+- **Tower A:**
+  - S and N faces are fins (6 bays); W and E faces are framed balconies.
+  - Crown: a twisted fan. The SW and NE corners are at +115.0, SE and NW at +108.6 (bilinear surface).
+  - The S/N fins continue across the flat roof as blades whose tops trace that surface (photomontage p10 "fan").
+- **Tower B:**
+  - Site-plan L footprint (x 36.9–71.1).
+  - S and N faces are framed balconies over the full width. W face, E face and the step face are fins (bay 3.4 m).
+  - Crown: peak +66.0 at the SW corner, falling to about +57.7 east and north.
+- **Removed:** LED strips and dark posts (not in any render). Roofs are flat and light (p10).
+- **Comparisons:** `notes/compare_*.jpg`.
+  - Street view p05: camera solved from the render (`blender/stills.py match_p05_dusk --no-context`).
+  - Top view vs site plan: `plan_top`.
+  - Aerial vs photomontage p10: `aerial_p10`.
+- **Known open points:**
+  - The architect's renders disagree with each other in places (tower spacing, B's width in p08), so I matched the
+    majority plus the cadastral plot.
+  - Still to check against p09 / p10: the exact fan-blade spacing and how far the blades rise.
+  - Still to check against p01: the balcony-box size in the fin bays.
+
+### Rendering (Blender, real city)
+- **Stills:** `blender/stills.py <preset>` (`--list`). Presets: golden_street, aerial_golden, day_front, blue_hour,
+  night_aerial, garden, match_p05*, plan_top, aerial_p10. Options:
+  - `--no-context`: building only.
+  - `--blend`: save the scene for the Blender GUI.
+- **Reels:** `blender/reels.py <reel>` (rise, orbit, flyin, nightpush). Vertical 1080x1920, resumable PNG frames,
+  ffmpeg -> `public/assets/reels/<reel>.mp4`.
+- **Real city:** needs a Google Map Tiles key (`GOOGLE_MAPS_BROWSER_KEY`). Run `node scripts/google_tiles.mjs`; it
+  writes `blender/out/gtiles`, and stills/reels then use the tiles automatically:
+  - levelled to the street
+  - plot and modelled avenue flattened
+  - "Google" attribution burned into the reels
+- **Build order** (raw outputs in `blender/out`, git-ignored):
+  `textures.py -> build_building.py --blend -> build_site.py --blend -> build_parking.py --blend -> build_props.py`,
+  then `npm run optimize` for the web GLBs.
+- **Local GPU (Windows/RTX):**
+  - Run the `.py` files with Blender's Python (`blender -b -P blender/stills.py -- <preset>` works because the
+    scripts only use bpy), or pip-install bpy 5.2.3 for Python 3.13.
+  - In `render()` / `render_frames()`, set `scene.cycles.device = "GPU"` and enable OptiX/CUDA in the preferences.
+
+### Web
+`npm run dev`. The claude.ai preview build is `scripts/build-artifact.sh`.
+Vercel: import the repo with Root Directory `tower-pitch`. The Vercel connector in the cloud session had no
+project-create permission.

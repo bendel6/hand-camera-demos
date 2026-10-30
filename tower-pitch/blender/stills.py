@@ -35,6 +35,8 @@ PRESETS = {
     "match_p05": dict(cam=(-141.8, -398.3, 1.7), tgt=(-65.9, -213.3, 1.7), lens=123.3, shift=0.39, tod="blue", sun=(255, -2), exp=0.9),
     "match_p05_golden": dict(cam=(-141.8, -398.3, 1.7), tgt=(-65.9, -213.3, 1.7), lens=123.3, shift=0.39, tod="golden", sun=(250, 6), exp=0.3),
     "match_p05_dusk": dict(cam=(-141.8, -398.3, 1.7), tgt=(-65.9, -213.3, 1.7), lens=123.3, shift=0.39, tod="dusk", sun=(255, -1), exp=0.55),
+    "plan_top": dict(cam=(40.6, 32.3, 400), tgt=(40.6, 32.31, 0), lens=50, shift=0.0, tod="day", sun=(200, 55), exp=-0.3, ortho=88),
+    "aerial_p10": dict(cam=(-190, -150, 175), tgt=(40, 25, 55), lens=40, shift=0.0, tod="day", sun=(220, 40), exp=-0.2),
     "top": dict(cam=(40, 0, 600), tgt=(40, 0.01, 0), lens=30, shift=0.0, tod="day", sun=(200, 45), exp=-0.2),
 }
 
@@ -556,6 +558,9 @@ def setup_camera(p):
     if p.get("shift_override", p["shift"]) > 0:
         direction.z = 0  # keep verticals straight; the lens shift frames the towers
     cam.rotation_euler = direction.to_track_quat("-Z", "Y").to_euler()
+    if p.get("ortho"):
+        cd.type = "ORTHO"
+        cd.ortho_scale = p["ortho"]
     bpy.context.scene.camera = cam
 
 
