@@ -1,0 +1,358 @@
+{
+ "site_elevation_m_asl": 462.9,
+ "coords": "three.js [x, z]; x = east m, z = -north m; y = 0 at site ground",
+ "plot_three": [
+  [
+   0.0,
+   0.0
+  ],
+  [
+   78.6,
+   -11.7
+  ],
+  [
+   71.0,
+   -75.5
+  ],
+  [
+   -9.4,
+   -66.1
+  ]
+ ],
+ "entrance_three": [
+  39.9,
+  -3.9
+ ],
+ "kazbegi_avenue": {
+  "name": "ალექსანდრე ყაზბეგის გამზირი (Aleksandre Kazbegi Avenue)",
+  "class": "primary",
+  "carriageways": [
+   {
+    "id": "d89b6621-9c0b-4194-906f-33daf1e5c3d6",
+    "class": "primary",
+    "oneway": "forward",
+    "points": [
+     [
+      -294.6,
+      52.2
+     ],
+     [
+      -137.2,
+      32.4
+     ]
+    ],
+    "distance_to_site_centre_m": 186.2
+   },
+   {
+    "id": "6f8ad6ba-c760-4463-83e3-fa70ed8051cd",
+    "class": "primary",
+    "oneway": "forward",
+    "points": [
+     [
+      -352.1,
+      59.7
+     ],
+     [
+      -294.6,
+      52.2
+     ]
+    ],
+    "distance_to_site_centre_m": 342.0
+   },
+   {
+    "id": "e2003310-f543-473a-bdca-6c818be5d6cc",
+    "class": "primary",
+    "oneway": "forward",
+    "points": [
+     [
+      -137.2,
+      32.4
+     ],
+     [
+      175.5,
+      -8.7
+     ]
+    ],
+    "distance_to_site_centre_m": 46.8
+   },
+   {
+    "id": "2db55bb1-6a18-48e9-aa5a-768adc610096",
+    "class": "primary",
+    "oneway": "forward",
+    "points": [
+     [
+      175.5,
+      -8.7
+     ],
+     [
+      380.5,
+      -35.5
+     ]
+    ],
+    "distance_to_site_centre_m": 143.2
+   },
+   {
+    "id": "e4d949b3-fa3c-437f-97c9-20a3ee65318d",
+    "class": "primary",
+    "oneway": "forward",
+    "points": [
+     [
+      380.5,
+      -35.5
+     ],
+     [
+      435.1,
+      -42.7
+     ]
+    ],
+    "distance_to_site_centre_m": 345.1
+   }
+  ],
+  "carriageway_separation_m": null,
+  "plot_frontage_to_centreline_m": 14.9,
+  "estimated_total_width_m": 17.0,
+  "width_note": "Overture maps it here as ONE one-way (eastbound, +x) primary carriageway; width not in the data, estimated from the client site plan (about 4 lanes, 17-19 m)"
+ },
+ "nearby_roads": [
+  {
+   "name": "ვაჟა-ფშაველას გამზირი",
+   "class": "primary",
+   "distance_m": 95.3,
+   "points": [
+    [
+     [
+      154.1,
+      -149.2
+     ],
+     [
+      -163.3,
+      -107.8
+     ]
+    ],
+    [
+     [
+      304.7,
+      -169.0
+     ],
+     [
+      154.1,
+      -149.2
+     ]
+    ]
+   ]
+  },
+  {
+   "name": "იონა ვაკელის ქუჩა",
+   "class": "secondary",
+   "distance_m": 135.3,
+   "points": [
+    [
+     [
+      154.1,
+      -149.2
+     ],
+     [
+      159.7,
+      -129.5
+     ],
+     [
+      175.5,
+      -8.7
+     ]
+    ]
+   ]
+  },
+  {
+   "name": "ტანძიის ქუჩა",
+   "class": "secondary",
+   "distance_m": 143.2,
+   "points": [
+    [
+     [
+      175.5,
+      -8.7
+     ],
+     [
+      191.8,
+      123.5
+     ]
+    ]
+   ]
+  }
+ ],
+ "service_roads_within_100m": [
+  {
+   "points": [
+    [
+     -28.7,
+     -20.2
+    ],
+    [
+     -68.0,
+     -15.6
+    ],
+    [
+     -73.8,
+     -59.7
+    ],
+    [
+     -60.5,
+     -59.9
+    ]
+   ],
+   "distance_m": 66.4
+  },
+  {
+   "points": [
+    [
+     -33.4,
+     -55.0
+    ],
+    [
+     -28.7,
+     -20.2
+    ],
+    [
+     -23.9,
+     -14.1
+    ]
+   ],
+   "distance_m": 63.8
+  },
+  {
+   "points": [
+    [
+     -83.7,
+     -118.3
+    ],
+    [
+     -78.0,
+     -74.4
+    ],
+    [
+     62.8,
+     -92.7
+    ]
+   ],
+   "distance_m": 51.0
+  },
+  {
+   "points": [
+    [
+     -19.0,
+     16.7
+    ],
+    [
+     -23.9,
+     -14.1
+    ]
+   ],
+   "distance_m": 63.8
+  },
+  {
+   "points": [
+    [
+     33.2,
+     -59.5
+    ],
+    [
+     15.1,
+     -57.0
+    ],
+    [
+     22.2,
+     -6.8
+    ],
+    [
+     21.1,
+     -2.3
+    ],
+    [
+     23.0,
+     11.0
+    ]
+   ],
+   "distance_m": 17.4
+  },
+  {
+   "points": [
+    [
+     21.1,
+     -2.3
+    ],
+    [
+     16.4,
+     -5.7
+    ],
+    [
+     7.5,
+     -28.0
+    ],
+    [
+     3.4,
+     -55.3
+    ]
+   ],
+   "distance_m": 29.0
+  },
+  {
+   "points": [
+    [
+     108.5,
+     -143.5
+    ],
+    [
+     98.1,
+     -156.4
+    ],
+    [
+     92.9,
+     -161.6
+    ],
+    [
+     12.6,
+     -150.7
+    ],
+    [
+     -1.1,
+     -129.1
+    ]
+   ],
+   "distance_m": 98.4
+  },
+  {
+   "points": [
+    [
+     84.4,
+     3.2
+    ],
+    [
+     76.4,
+     -64.2
+    ],
+    [
+     95.3,
+     -66.6
+    ]
+   ],
+   "distance_m": 43.9
+  },
+  {
+   "points": [
+    [
+     84.4,
+     198.8
+    ],
+    [
+     66.1,
+     46.4
+    ],
+    [
+     62.0,
+     6.0
+    ]
+   ],
+   "distance_m": 51.2
+  }
+ ]
+}

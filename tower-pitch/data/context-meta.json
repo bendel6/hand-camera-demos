@@ -1,0 +1,677 @@
+{
+ "extent_local": {
+  "E0": -4763,
+  "N0": -6156,
+  "E1": 8539,
+  "N1": 5502
+ },
+ "extent_three": {
+  "xmin": -4763,
+  "xmax": 8539,
+  "zmin": -5502,
+  "zmax": 6156
+ },
+ "site_elevation_m_asl": 462.9,
+ "site_centre_three": [
+  35.33,
+  0,
+  -37.74
+ ],
+ "plot_three": [
+  [
+   0.0,
+   0.0
+  ],
+  [
+   78.56,
+   -11.72
+  ],
+  [
+   70.96,
+   -75.52
+  ],
+  [
+   -9.35,
+   -66.07
+  ]
+ ],
+ "flatten_radius_m": [
+  120,
+  280
+ ],
+ "ground_texture": "public/textures/ground.webp; terrain UVs use glTF convention (v=0 = north edge = top row): set texture.flipY = false",
+ "building_material": "ctx_building uses COLOR_0 (warm white, darker at base) and no normals -> GLTFLoader enables flatShading",
+ "chunks": {
+  "ctx_near": {
+   "buildings": 247,
+   "tris": 4411
+  },
+  "ctx_bld_0_1": {
+   "buildings": 3,
+   "tris": 30
+  },
+  "ctx_bld_0_10": {
+   "buildings": 1,
+   "tris": 10
+  },
+  "ctx_bld_0_11": {
+   "buildings": 2,
+   "tris": 20
+  },
+  "ctx_bld_0_2": {
+   "buildings": 380,
+   "tris": 3800
+  },
+  "ctx_bld_0_3": {
+   "buildings": 598,
+   "tris": 5980
+  },
+  "ctx_bld_0_4": {
+   "buildings": 42,
+   "tris": 420
+  },
+  "ctx_bld_0_5": {
+   "buildings": 225,
+   "tris": 2549
+  },
+  "ctx_bld_0_6": {
+   "buildings": 47,
+   "tris": 638
+  },
+  "ctx_bld_0_7": {
+   "buildings": 219,
+   "tris": 2190
+  },
+  "ctx_bld_0_8": {
+   "buildings": 319,
+   "tris": 3190
+  },
+  "ctx_bld_0_9": {
+   "buildings": 4,
+   "tris": 40
+  },
+  "ctx_bld_10_0": {
+   "buildings": 386,
+   "tris": 4108
+  },
+  "ctx_bld_10_1": {
+   "buildings": 678,
+   "tris": 6816
+  },
+  "ctx_bld_10_10": {
+   "buildings": 20,
+   "tris": 200
+  },
+  "ctx_bld_10_11": {
+   "buildings": 227,
+   "tris": 2372
+  },
+  "ctx_bld_10_2": {
+   "buildings": 968,
+   "tris": 9773
+  },
+  "ctx_bld_10_3": {
+   "buildings": 1013,
+   "tris": 10148
+  },
+  "ctx_bld_10_4": {
+   "buildings": 123,
+   "tris": 1230
+  },
+  "ctx_bld_10_5": {
+   "buildings": 63,
+   "tris": 630
+  },
+  "ctx_bld_10_6": {
+   "buildings": 523,
+   "tris": 5230
+  },
+  "ctx_bld_10_7": {
+   "buildings": 498,
+   "tris": 5016
+  },
+  "ctx_bld_10_8": {
+   "buildings": 17,
+   "tris": 170
+  },
+  "ctx_bld_11_0": {
+   "buildings": 508,
+   "tris": 5203
+  },
+  "ctx_bld_11_1": {
+   "buildings": 750,
+   "tris": 7518
+  },
+  "ctx_bld_11_10": {
+   "buildings": 111,
+   "tris": 1128
+  },
+  "ctx_bld_11_11": {
+   "buildings": 120,
+   "tris": 1200
+  },
+  "ctx_bld_11_2": {
+   "buildings": 496,
+   "tris": 4960
+  },
+  "ctx_bld_11_3": {
+   "buildings": 50,
+   "tris": 500
+  },
+  "ctx_bld_11_4": {
+   "buildings": 70,
+   "tris": 700
+  },
+  "ctx_bld_11_5": {
+   "buildings": 126,
+   "tris": 1260
+  },
+  "ctx_bld_11_6": {
+   "buildings": 681,
+   "tris": 6810
+  },
+  "ctx_bld_11_7": {
+   "buildings": 237,
+   "tris": 2424
+  },
+  "ctx_bld_11_8": {
+   "buildings": 13,
+   "tris": 184
+  },
+  "ctx_bld_12_0": {
+   "buildings": 600,
+   "tris": 6006
+  },
+  "ctx_bld_12_1": {
+   "buildings": 496,
+   "tris": 5020
+  },
+  "ctx_bld_12_10": {
+   "buildings": 30,
+   "tris": 300
+  },
+  "ctx_bld_12_11": {
+   "buildings": 35,
+   "tris": 350
+  },
+  "ctx_bld_12_2": {
+   "buildings": 194,
+   "tris": 1970
+  },
+  "ctx_bld_12_3": {
+   "buildings": 425,
+   "tris": 4286
+  },
+  "ctx_bld_12_4": {
+   "buildings": 156,
+   "tris": 1677
+  },
+  "ctx_bld_12_5": {
+   "buildings": 68,
+   "tris": 680
+  },
+  "ctx_bld_12_6": {
+   "buildings": 97,
+   "tris": 970
+  },
+  "ctx_bld_12_7": {
+   "buildings": 27,
+   "tris": 270
+  },
+  "ctx_bld_13_0": {
+   "buildings": 153,
+   "tris": 1545
+  },
+  "ctx_bld_13_1": {
+   "buildings": 102,
+   "tris": 1086
+  },
+  "ctx_bld_13_11": {
+   "buildings": 23,
+   "tris": 230
+  },
+  "ctx_bld_13_2": {
+   "buildings": 80,
+   "tris": 800
+  },
+  "ctx_bld_13_3": {
+   "buildings": 66,
+   "tris": 698
+  },
+  "ctx_bld_13_4": {
+   "buildings": 5,
+   "tris": 50
+  },
+  "ctx_bld_13_5": {
+   "buildings": 2,
+   "tris": 20
+  },
+  "ctx_bld_13_7": {
+   "buildings": 3,
+   "tris": 30
+  },
+  "ctx_bld_1_0": {
+   "buildings": 54,
+   "tris": 540
+  },
+  "ctx_bld_1_1": {
+   "buildings": 6,
+   "tris": 60
+  },
+  "ctx_bld_1_11": {
+   "buildings": 216,
+   "tris": 2160
+  },
+  "ctx_bld_1_2": {
+   "buildings": 1,
+   "tris": 10
+  },
+  "ctx_bld_1_3": {
+   "buildings": 101,
+   "tris": 1061
+  },
+  "ctx_bld_1_4": {
+   "buildings": 152,
+   "tris": 2221
+  },
+  "ctx_bld_1_5": {
+   "buildings": 330,
+   "tris": 5001
+  },
+  "ctx_bld_1_6": {
+   "buildings": 286,
+   "tris": 4494
+  },
+  "ctx_bld_1_7": {
+   "buildings": 426,
+   "tris": 5403
+  },
+  "ctx_bld_1_8": {
+   "buildings": 118,
+   "tris": 1566
+  },
+  "ctx_bld_1_9": {
+   "buildings": 29,
+   "tris": 290
+  },
+  "ctx_bld_2_0": {
+   "buildings": 294,
+   "tris": 2940
+  },
+  "ctx_bld_2_1": {
+   "buildings": 14,
+   "tris": 140
+  },
+  "ctx_bld_2_10": {
+   "buildings": 43,
+   "tris": 430
+  },
+  "ctx_bld_2_11": {
+   "buildings": 542,
+   "tris": 5420
+  },
+  "ctx_bld_2_3": {
+   "buildings": 89,
+   "tris": 1145
+  },
+  "ctx_bld_2_4": {
+   "buildings": 396,
+   "tris": 5604
+  },
+  "ctx_bld_2_5": {
+   "buildings": 268,
+   "tris": 4531
+  },
+  "ctx_bld_2_6": {
+   "buildings": 623,
+   "tris": 9074
+  },
+  "ctx_bld_2_7": {
+   "buildings": 299,
+   "tris": 3661
+  },
+  "ctx_bld_2_8": {
+   "buildings": 4,
+   "tris": 58
+  },
+  "ctx_bld_2_9": {
+   "buildings": 30,
+   "tris": 318
+  },
+  "ctx_bld_3_0": {
+   "buildings": 97,
+   "tris": 970
+  },
+  "ctx_bld_3_1": {
+   "buildings": 6,
+   "tris": 60
+  },
+  "ctx_bld_3_10": {
+   "buildings": 280,
+   "tris": 2800
+  },
+  "ctx_bld_3_11": {
+   "buildings": 638,
+   "tris": 6416
+  },
+  "ctx_bld_3_3": {
+   "buildings": 68,
+   "tris": 764
+  },
+  "ctx_bld_3_4": {
+   "buildings": 212,
+   "tris": 3656
+  },
+  "ctx_bld_3_5": {
+   "buildings": 349,
+   "tris": 6553
+  },
+  "ctx_bld_3_6": {
+   "buildings": 703,
+   "tris": 10297
+  },
+  "ctx_bld_3_7": {
+   "buildings": 214,
+   "tris": 2747
+  },
+  "ctx_bld_3_8": {
+   "buildings": 2,
+   "tris": 26
+  },
+  "ctx_bld_4_0": {
+   "buildings": 154,
+   "tris": 1540
+  },
+  "ctx_bld_4_1": {
+   "buildings": 134,
+   "tris": 1340
+  },
+  "ctx_bld_4_10": {
+   "buildings": 507,
+   "tris": 5144
+  },
+  "ctx_bld_4_11": {
+   "buildings": 440,
+   "tris": 4400
+  },
+  "ctx_bld_4_2": {
+   "buildings": 5,
+   "tris": 56
+  },
+  "ctx_bld_4_3": {
+   "buildings": 31,
+   "tris": 376
+  },
+  "ctx_bld_4_4": {
+   "buildings": 623,
+   "tris": 9170
+  },
+  "ctx_bld_4_5": {
+   "buildings": 238,
+   "tris": 3691
+  },
+  "ctx_bld_4_6": {
+   "buildings": 937,
+   "tris": 12208
+  },
+  "ctx_bld_4_7": {
+   "buildings": 431,
+   "tris": 5441
+  },
+  "ctx_bld_4_8": {
+   "buildings": 83,
+   "tris": 1327
+  },
+  "ctx_bld_4_9": {
+   "buildings": 253,
+   "tris": 3025
+  },
+  "ctx_bld_5_0": {
+   "buildings": 94,
+   "tris": 940
+  },
+  "ctx_bld_5_1": {
+   "buildings": 327,
+   "tris": 3270
+  },
+  "ctx_bld_5_10": {
+   "buildings": 348,
+   "tris": 3570
+  },
+  "ctx_bld_5_11": {
+   "buildings": 302,
+   "tris": 3161
+  },
+  "ctx_bld_5_2": {
+   "buildings": 24,
+   "tris": 249
+  },
+  "ctx_bld_5_3": {
+   "buildings": 455,
+   "tris": 6056
+  },
+  "ctx_bld_5_4": {
+   "buildings": 566,
+   "tris": 9136
+  },
+  "ctx_bld_5_5": {
+   "buildings": 1164,
+   "tris": 16373
+  },
+  "ctx_bld_5_6": {
+   "buildings": 814,
+   "tris": 11640
+  },
+  "ctx_bld_5_7": {
+   "buildings": 781,
+   "tris": 9534
+  },
+  "ctx_bld_5_8": {
+   "buildings": 131,
+   "tris": 2009
+  },
+  "ctx_bld_5_9": {
+   "buildings": 735,
+   "tris": 9304
+  },
+  "ctx_bld_6_0": {
+   "buildings": 154,
+   "tris": 1540
+  },
+  "ctx_bld_6_1": {
+   "buildings": 225,
+   "tris": 2250
+  },
+  "ctx_bld_6_10": {
+   "buildings": 292,
+   "tris": 2944
+  },
+  "ctx_bld_6_11": {
+   "buildings": 218,
+   "tris": 2258
+  },
+  "ctx_bld_6_2": {
+   "buildings": 138,
+   "tris": 1455
+  },
+  "ctx_bld_6_3": {
+   "buildings": 864,
+   "tris": 12135
+  },
+  "ctx_bld_6_4": {
+   "buildings": 635,
+   "tris": 9871
+  },
+  "ctx_bld_6_5": {
+   "buildings": 922,
+   "tris": 14123
+  },
+  "ctx_bld_6_6": {
+   "buildings": 420,
+   "tris": 7413
+  },
+  "ctx_bld_6_7": {
+   "buildings": 458,
+   "tris": 6606
+  },
+  "ctx_bld_6_8": {
+   "buildings": 435,
+   "tris": 6472
+  },
+  "ctx_bld_6_9": {
+   "buildings": 441,
+   "tris": 5802
+  },
+  "ctx_bld_7_1": {
+   "buildings": 30,
+   "tris": 366
+  },
+  "ctx_bld_7_10": {
+   "buildings": 901,
+   "tris": 9139
+  },
+  "ctx_bld_7_11": {
+   "buildings": 240,
+   "tris": 2499
+  },
+  "ctx_bld_7_2": {
+   "buildings": 508,
+   "tris": 5104
+  },
+  "ctx_bld_7_3": {
+   "buildings": 1148,
+   "tris": 15744
+  },
+  "ctx_bld_7_4": {
+   "buildings": 549,
+   "tris": 9273
+  },
+  "ctx_bld_7_5": {
+   "buildings": 515,
+   "tris": 8463
+  },
+  "ctx_bld_7_6": {
+   "buildings": 840,
+   "tris": 12549
+  },
+  "ctx_bld_7_7": {
+   "buildings": 773,
+   "tris": 9481
+  },
+  "ctx_bld_7_8": {
+   "buildings": 1066,
+   "tris": 13483
+  },
+  "ctx_bld_7_9": {
+   "buildings": 1636,
+   "tris": 16780
+  },
+  "ctx_bld_8_0": {
+   "buildings": 47,
+   "tris": 470
+  },
+  "ctx_bld_8_1": {
+   "buildings": 18,
+   "tris": 261
+  },
+  "ctx_bld_8_10": {
+   "buildings": 690,
+   "tris": 6942
+  },
+  "ctx_bld_8_11": {
+   "buildings": 482,
+   "tris": 4876
+  },
+  "ctx_bld_8_2": {
+   "buildings": 934,
+   "tris": 9792
+  },
+  "ctx_bld_8_3": {
+   "buildings": 756,
+   "tris": 7838
+  },
+  "ctx_bld_8_4": {
+   "buildings": 1541,
+   "tris": 18868
+  },
+  "ctx_bld_8_5": {
+   "buildings": 1142,
+   "tris": 14976
+  },
+  "ctx_bld_8_6": {
+   "buildings": 1819,
+   "tris": 21798
+  },
+  "ctx_bld_8_7": {
+   "buildings": 1936,
+   "tris": 22081
+  },
+  "ctx_bld_8_8": {
+   "buildings": 1238,
+   "tris": 13091
+  },
+  "ctx_bld_8_9": {
+   "buildings": 93,
+   "tris": 930
+  },
+  "ctx_bld_9_0": {
+   "buildings": 509,
+   "tris": 5090
+  },
+  "ctx_bld_9_1": {
+   "buildings": 440,
+   "tris": 4400
+  },
+  "ctx_bld_9_10": {
+   "buildings": 34,
+   "tris": 340
+  },
+  "ctx_bld_9_11": {
+   "buildings": 115,
+   "tris": 1188
+  },
+  "ctx_bld_9_2": {
+   "buildings": 1123,
+   "tris": 11310
+  },
+  "ctx_bld_9_3": {
+   "buildings": 974,
+   "tris": 9875
+  },
+  "ctx_bld_9_4": {
+   "buildings": 1428,
+   "tris": 14331
+  },
+  "ctx_bld_9_5": {
+   "buildings": 805,
+   "tris": 8050
+  },
+  "ctx_bld_9_6": {
+   "buildings": 1112,
+   "tris": 11120
+  },
+  "ctx_bld_9_7": {
+   "buildings": 1005,
+   "tris": 10050
+  },
+  "ctx_bld_9_8": {
+   "buildings": 16,
+   "tris": 160
+  },
+  "ctx_bld_9_9": {
+   "buildings": 4,
+   "tris": 40
+  }
+ },
+ "triangles_total": 974849,
+ "buildings": {
+  "skipped_plot": 5,
+  "skipped_small": 23195,
+  "skipped_other": 848,
+  "kept": 60463
+ },
+ "dem": {
+  "source": "AWS Terrain Tiles (terrarium z14)",
+  "filled_nodata_px": 121
+ }
+}

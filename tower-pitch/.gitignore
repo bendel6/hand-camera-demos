@@ -1,0 +1,12 @@
+*.blend1
+.env
+.env.*
+__pycache__/
+blender/out/
+data/*.parquet
+data/terrain_z14.npz
+dist/
+input/*.pdf
+node_modules/
+public/assets/pdf/raw/
+dist-artifact/
